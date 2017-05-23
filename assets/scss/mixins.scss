@@ -1,0 +1,27 @@
+/**
+ * Mixins
+ * ======
+ */
+
+@mixin flow-into($flow) {
+    -webkit-flow-into: $flow;
+            flow-into: $flow;
+}
+
+@mixin flow-from($flow) {
+    -webkit-flow-from: $flow;
+            flow-from: $flow;
+}
+
+// Pas de footer sur ces pages
+@mixin no-footer($page) {
+    .paper:nth-of-type(#{$page}) .body:before,
+    .paper:nth-of-type(#{$page}) .body:after { content: "" }
+}
+
+@mixin trans($rotate, $skew, $originY, $originX) {
+  -webkit-transform: skewY($skew) rotate($rotate);
+          transform: skewY($skew) rotate($rotate);
+  -webkit-transform-origin: $originY $originX;
+          transform-origin: $originY $originX;
+}

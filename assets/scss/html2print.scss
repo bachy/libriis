@@ -1,0 +1,204 @@
+/**
+ * This file is part of HTML2print.
+ *
+ * HTML2print is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * HTML2print is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with HTML2print.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+/**
+ * Computation
+ */
+
+
+/* computes the edge size of the paper, which is the sum of the bleed and the
+ * crop sizes */
+$edge: $crop-size + $bleed;
+
+/* Computes the size of the paper sheet */
+$paper-width: $page-width + ( $edge * 2 );
+$paper-height: $page-height + ( $edge * 2 );
+
+/**
+ * DEFINITION OF THE PAPER SHEET
+ */
+
+/**
+ * The $page CSS at-rule is used to define some properties of printed
+ * documents. We make it the size of the elements with the .paper class and
+ * remove any margins so they don't add up with margins specifed in elements
+ * with the .page class (or it's children, like .header, .body and .footer)
+ *
+ * We add 2pt to circumvent a rounding number bug in some browsers that make
+ * them include extra pages or shifts.
+ */
+@page {
+    size: $paper-width $paper-height + 2pt;
+    margin: 0;
+}
+
+
+/**
+ * CANVAS
+ */
+
+@media all {
+    body {
+        margin: 0;
+
+        /* Activate opentype features and kernings */
+        -webkit-font-feature-settings: "liga", "dlig", "clig", "kern";
+        text-rendering: optimizeLegibility;
+    }
+
+    .paper {
+        width: $paper-width;
+        height: $paper-height;
+        box-sizing: border-box;
+
+        /* defines a named counter and increments it every page, so we can use
+         * it to compute the page number */
+        counter-increment: folio;
+
+        /* makes sure that pages aren't cut because of pootential unprecise unit
+         * conversion at printing time */
+        page-break-inside: avoid;
+        page-break-after: always;
+
+        /* clips the content if it goes out of the page, so it doesn't increase
+         * the format */
+        overflow: hidden;
+
+        /* Crop marks */
+        padding: $edge;
+        position: relative;
+
+        /* Crop marks */
+        background-image:
+            -webkit-linear-gradient(90deg, black 0, black 100%),
+            -webkit-linear-gradient(0deg, black 0, black 100%),
+            -webkit-linear-gradient(90deg, black 0, black 100%),
+            -webkit-linear-gradient(0deg, black 0, black 100%),
+            -webkit-linear-gradient(90deg, black 0, black 100%),
+            -webkit-linear-gradient(0deg, black 0, black 100%),
+            -webkit-linear-gradient(90deg, black 0, black 100%),
+            -webkit-linear-gradient(0deg, black 0, black 100%)
+        ;
+        background-size:
+            $crop-size 1px,
+            1px $crop-size,
+            $crop-size 1px,
+            1px $crop-size,
+            $crop-size 1px,
+            1px $crop-size,
+            $crop-size 1px,
+            1px $crop-size
+        ;
+        background-position:
+            left $edge,
+            $edge top,
+            right $edge,
+            ($paper-width - $edge) top,
+            right ($paper-height - $edge),
+            ($paper-width - $edge) bottom,
+            left ($paper-height - $edge),
+            $edge bottom
+        ;
+        background-repeat: no-repeat;
+    }
+
+    .page {
+        /* defines the page size */
+        width: $page-width;
+        height: $page-height;
+
+        /* allows for absolutely positioned elements as settings the position
+         * property to relative as the side effect of making this elements
+         * top-left corner the reference point */
+        /*position: relative;*/
+        position: absolute; // FIXME: test it for printing issues
+    }
+
+    // TODO: changer le format du papier en spread pour pouvoir imprimer en planche
+    .spread .paper { float: left; }
+
+    .spread:not(.facing) .paper:nth-child(odd) { margin-left: -$edge; }
+    .spread:not(.facing) .paper:nth-child(even) { margin-right: -$edge; }
+    .spread:not(.facing) .paper:first-child { margin-left: $page-width; }
+
+    .spread.facing .paper:nth-child(even) { margin-right: initial; margin-left: -$edge; }
+    .spread.facing .paper:nth-child(odd) { margin-left: initial; margin-right: -$edge; }
+    .spread.facing .paper:first-child { margin-left: 0; }
+}
+
+@media screen {
+    /* defines the background color of the workspace */
+    /* UI */
+    body { background-color: #F0F0F0; }
+
+    #pages {
+        width: $paper-width;
+        height: $paper-height;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* FIXME: allows for printing spreads as well */
+    .spread #pages {
+        width: $paper-width * 2;
+        height: $paper-height * 2;
+    }
+    .paper {
+        /* centrer la page à l'écran */
+        /* UI */
+        background-color: white;
+        /* UI */
+        margin-top: 1em;
+        /* UI */
+        margin-bottom: 1em;
+    }
+    /* UI */
+    .normal .page { outline: 1px dotted lightsalmon; }
+    /* UI */
+    .preview .paper { background: transparent; }
+    /* UI */
+    .preview .page {
+        outline: 1px solid lightgray;
+        background-color: white;
+        overflow: hidden;
+    }
+}
+
+
+@media print {
+    html { width: $paper-width; }
+    body {
+        /* Allows for background colors printing */
+        background-color: transparent;
+        -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+    }
+}
+
+/**
+ * Helpers
+ */
+
+.region-break {
+    /* Apply this class to an element to put it on a new region.
+     * Hint:
+     * You can also use an empty <div class="page-break"></div>
+     * if you want to put manual page breaks without attaching it to an HTML element
+     */
+    -webkit-region-break-before: always;
+}

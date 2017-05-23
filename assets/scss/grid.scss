@@ -1,0 +1,169 @@
+$body-width: $page-width - $page-margin-inside - $page-margin-outside;
+$body-height: $page-height - $page-margin-top - $page-margin-bottom;
+
+$col-width: ($body-width - (($col-number - 1) * $col-gutter)) / $col-number;
+$row-height: ($body-height - (($row-number - 1) * $row-gutter)) / $row-number;
+
+$col-gutter-width: $col-width + $col-gutter;
+$row-gutter-height: $row-height + $row-gutter;
+
+
+/* x classes */
+// .create-x-classes($i:0) when($i < $col-number) {
+//     .x#{i}{
+//        left: ($i * $col-width) + ($i * $col-gutter);
+//     }
+//     .create-x-classes($i + 1);
+// }
+// .create-x-classes();
+@for $i from 0 through $col-number - 1{
+    .x#{$i}{
+       left: ($i * $col-width) + ($i * $col-gutter);
+    }
+}
+
+/* y classes */
+// .create-y-classes($i:0) when($i < $row-number) {
+//     .y#{i}{
+//        top: ($i * $row-height) + ($i * $row-gutter);
+//     }
+//     .create-y-classes($i + 1);
+// }
+// .create-y-classes();
+@for $i from 0 through $row-number - 1 {
+    .y#{$i}{
+       top: ($i * $row-height) + ($i * $row-gutter);
+    }
+}
+
+/* width classes */
+// .create-w-classes($i:1) when($i <= $col-number) {
+//     .w#{i}{
+//        width: ($col-width * $i) + ($col-gutter * ($i - 1));
+//     }
+//     .create-w-classes($i + 1);
+// }
+// .create-w-classes();
+@for $i from 1 through $col-number {
+    .w#{$i}{
+       width: ($col-width * $i) + ($col-gutter * ($i - 1));
+    }
+}
+
+/* height classes */
+// .create-h-classes($i:1) when($i <= $row-number) {
+//     .h#{i}{
+//        height: ($row-height * $i) + ($row-gutter * ($i - 1));
+//     }
+//     .create-h-classes($i + 1);
+// }
+// .create-h-classes();
+@for $i from 1 through $row-number {
+    .h#{$i}{
+       height: ($row-height * $i) + ($row-gutter * ($i - 1));
+    }
+}
+
+
+// .create-grid-classes($prop: left, $class-name: x, $max-size: 100, $i: 0, $offset: 0, $odd: true) when ($offset <= $max-size) {
+//     .#{class-name}#{i} {
+//        #{prop}: $offset;
+//     };
+//
+//     & when ($odd) {
+//         .create-grid-classes($prop, $class-name, $max-size, $i + 1, $offset + $col-width, false)
+//     };
+//
+//     & when not ($odd) {
+//         .create-grid-classes($prop, $class-name, $max-size, $i + 1, $offset + $col-gutter, true)
+//     };
+// }
+@mixin create-grid-classes($prop: left, $class-name: x, $max-size: 100, $i: 0, $offset: 0, $odd: true){
+  $i:0;
+
+  .#{$class-name}#{$i} {
+     #{$prop}: $offset;
+  };
+
+  @while $offset<=$max-size {
+    $i: $i+1;
+    @if $odd{
+      $offset:$offset+$col-width;
+      $odd:false;
+    }@else{
+      $offset:$offset+$col-gutter;
+      $odd:true;
+    }
+    .#{$class-name}#{$i} {
+       #{$prop}: $offset;
+    };
+  }
+}
+
+
+html:not(.facing) .paper:nth-child(odd) .l-1,
+html.facing .paper:nth-child(even) .l-1 { left: -( $page-margin-inside + 14pt); }
+
+html:not(.facing) .paper:nth-child(even) .l-1,
+html.facing .paper:nth-child(odd) .l-1 { left: -( $page-margin-outside + 14pt); }
+
+// .create-grid-classes(left, l, $body-width);
+@include create-grid-classes(left, l, $body-width);
+
+html:not(.facing) .paper:nth-child(odd) .r-1,
+html.facing .paper:nth-child(even) .r-1 { right: -( $page-margin-outside + 14pt); }
+
+html:not(.facing) .paper:nth-child(even) .r-1,
+html.facing .paper:nth-child(odd) .r-1 { right: -( $page-margin-inside + 14pt); }
+
+// .create-grid-classes(right, r, $body-width);
+@include create-grid-classes(right, r, $body-width);
+
+.t-1 { top: -( $page-margin-top + 14pt); }
+// .create-grid-classes(top, t, $body-height);
+@include create-grid-classes(top, t, $body-height);
+
+.b-1 { bottom: -( $page-margin-bottom + 14pt); }
+// .create-grid-classes(bottom, b, $body-height);
+@include create-grid-classes(bottom, b, $body-height);
+
+
+.grid .body {
+    outline: 1px solid $grid-color;
+    background-attachment: local;
+    background-size: 100% $row-gutter-height,
+                     $col-gutter-width 100%,
+                     100% $row-gutter-height,
+                     $col-gutter-width 100%,
+                     100% 12pt;
+    background-position: -1px -1px,
+                         -1px -1px,
+                         -($col-gutter + 0) -($row-gutter + 0),
+                         -($col-gutter + 0) -($row-gutter + 0),
+                         0 -1px;
+    background-image: -webkit-linear-gradient(top, $grid-color 1px, transparent 1px),
+                      -webkit-linear-gradient(left, $grid-color 1px, transparent 1px),
+                      -webkit-linear-gradient(top, $grid-color 1px, transparent 1px),
+                      -webkit-linear-gradient(left, $grid-color 1px, transparent 1px),
+                      -webkit-linear-gradient(top, $baseline-grid-color 1px, transparent 1px);
+    background-image:    -moz-linear-gradient(top, $grid-color 1px, transparent 1px),
+                         -moz-linear-gradient(left, $grid-color 1px, transparent 1px),
+                         -moz-linear-gradient(top, $grid-color 1px, transparent 1px),
+                         -moz-linear-gradient(left, $grid-color 1px, transparent 1px),
+                         -moz-linear-gradient(top, $baseline-grid-color 1px, transparent 1px);
+    background-image:     -ms-linear-gradient(top, $grid-color 1px, transparent 1px),
+                          -ms-linear-gradient(left, $grid-color 1px, transparent 1px),
+                          -ms-linear-gradient(top, $grid-color 1px, transparent 1px),
+                          -ms-linear-gradient(left, $grid-color 1px, transparent 1px),
+                          -ms-linear-gradient(top, $baseline-grid-color 1px, transparent 1px);
+    background-image:      -o-linear-gradient(top, $grid-color 1px, transparent 1px),
+                           -o-linear-gradient(left, $grid-color 1px, transparent 1px),
+                           -o-linear-gradient(top, $grid-color 1px, transparent 1px),
+                           -o-linear-gradient(left, $grid-color 1px, transparent 1px),
+                           -o-linear-gradient(top, $baseline-grid-color 1px, transparent 1px);
+    background-image: linear-gradient(to bottom, $grid-color 1px, transparent 1px),
+                      linear-gradient(to right, $grid-color 1px, transparent 1px),
+                      linear-gradient(to bottom, $grid-color 1px, transparent 1px),
+                      linear-gradient(to right, $grid-color 1px, transparent 1px),
+                      linear-gradient(to bottom, $baseline-grid-color 1px, transparent 1px);
+}

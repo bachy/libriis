@@ -1,0 +1,113 @@
+/**
+ * Macro-structure
+ * ===============
+ */
+
+.body,
+.body:before,
+.body:after { position: absolute; }
+
+.body:before,
+.body:after { z-index: 500; }
+
+
+/**
+ * Zone de composition principale
+ * ------------------------------
+ */
+
+.body {
+    top: $page-margin-top;
+    bottom: $page-margin-bottom;
+}
+
+/* TODO: move into grid.less? */
+.bloc { position: absolute; z-index: 500; }
+// .debug .header,
+// .debug .footer,
+// .debug .body,
+// .debug .bloc { outline: 1px solid purple; }
+
+/**
+ * Pieds de page
+ * -------------
+ */
+
+.body:before,
+.body:after {
+    display: block;
+    font-family: sans-serif;
+    font-size: 6pt;
+    line-height: $line-height;
+    letter-spacing: 0.25pt;
+    z-index: 500;
+}
+
+// .body:before,
+// .body:after { bottom: $line-height * -3; }
+
+/*gauche*/
+.paper:nth-child(odd) .body:before { content: "Tous, des sang-mélés"; }
+/*droite*/
+.paper:nth-child(even) .body:before { content: "Tous, des sang-mélés"; }
+
+.body:after  { content: counter(folio); z-index: 499;}
+
+
+
+/**
+ * Miroir
+ * -------
+ */
+
+/**
+ * Placement en miroir des éléments en fonction de si ils se trouvent sur une
+ * page paire ou une page impaire, en utilisant le pseudo-sélecteur `nth-child`
+ */
+
+html:not(.facing) .paper:nth-child(odd) .body,
+html.facing .paper:nth-child(even) .body {
+    right: $page-margin-outside;
+    left: $page-margin-inside;
+}
+
+html:not(.facing) .paper:nth-child(even) .body,
+html.facing .paper:nth-child(odd) .body {
+    left: $page-margin-outside;
+    right: $page-margin-inside;
+}
+
+// html:not(.facing) .paper:nth-child(odd) .body:before,
+// html.facing .paper:nth-child(even) .body:before {
+//     @extend .x1;
+//     @extend .w4;
+// }
+// html:not(.facing) .paper:nth-child(even) .body:before,
+// html.facing .paper:nth-child(odd) .body:before {
+//     @extend .x5;
+//     @extend .w4;
+// }
+// html:not(.facing) .paper:nth-child(odd) .body:after,
+// html.facing .paper:nth-child(even) .body:after {
+//     @extend .x5;
+//     @extend .w1;
+//     text-align: left;
+// }
+// html:not(.facing) .paper:nth-child(even) .body:after,
+// html.facing .paper:nth-child(odd) .body:after {
+//     @extend .x1;
+//     @extend .w1;
+//     text-align: left;
+// }
+
+
+#flow-main {
+  position: relative;
+  -webkit-flow-into: flow-main;
+          flow-into: flow-main;
+}
+
+.flow-main {
+  -webkit-flow-from: flow-main;
+          flow-from: flow-main;
+}
