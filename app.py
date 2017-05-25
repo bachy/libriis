@@ -18,9 +18,10 @@ import threading
 
 from PyQt5.QtCore import QCoreApplication, QUrl, QFileSystemWatcher, pyqtSlot
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QApplication, QShortcut
-from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
-from PyQt5.QtWebKitWidgets import QWebPage, QWebView
+from PyQt5.QtWidgets import QWidget, QApplication, QShortcut, QGridLayout
+# from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
+from PyQt5.QtWebKit import QWebSettings
+from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
 
 import sass
 
@@ -84,7 +85,8 @@ class WebkitView(QWebView):
       self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
       self.shortcut.activated.connect(self.on_quit)
 
-      self.show()
+      self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
+      # self.show()
 
    @pyqtSlot()
    def on_quit(self):
@@ -102,7 +104,20 @@ def main():
 
    server = Server()
    compiler = Compiler()
+
+   grid = QGridLayout()
+
    webkitview = WebkitView(server.port)
+   grid.addWidget(webkitview, 1, 0)
+
+   webkitinspector = QWebInspector()
+   webkitinspector.setPage(webkitview.page())
+   grid.addWidget(webkitinspector, 2, 0)
+
+   # main app window
+   main_frame = QWidget()
+   main_frame.setLayout(grid)
+   main_frame.show()
 
    sys.exit(app.exec_())
 
