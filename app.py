@@ -18,8 +18,8 @@ import threading
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication, QUrl, QFileSystemWatcher, pyqtSlot, QSettings
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle
+from PyQt5.QtGui import QKeySequence, QFont, QSyntaxHighlighter
+from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle, QPlainTextEdit
 # from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
@@ -86,10 +86,22 @@ class WebkitView(QWebView):
 
 class WebkitInspector(QWebInspector):
    def __init__(self, webkitview):
-      super().__init__()
+      super(WebkitInspector, self).__init__()
       self.webkitview = webkitview
       self.setPage(self.webkitview.page())
       # TODO: webkitinspector is disappearing when chaging tabs
+
+class CodeEditor(QPlainTextEdit):
+   def __init__(self):
+      super(CodeEditor, self).__init__()
+      font = QFont()
+      font.setFamily('Courier')
+      font.setFixedPitch(True)
+      font.setPointSize(10)
+      self.setFont(font)
+      # self.highlighter = Highlighter(self.document())
+      # https://pypi.python.org/pypi/QScintilla/2.9.2
+
 
 class ViewTab(QWidget):
    def __init__(self, core):
@@ -113,7 +125,7 @@ class ViewTab(QWidget):
       hsplitter = QSplitter(QtCore.Qt.Horizontal)
       hsplitter.addWidget(vsplitter)
 
-      self.codeeditor = QLabel("Code Editor (SCSS & JS)")
+      self.codeeditor = CodeEditor()
       hsplitter.addWidget(self.codeeditor)
 
       hbox.addWidget(hsplitter)
