@@ -16,8 +16,9 @@ import socketserver
 import http.server
 import threading
 
-from PyQt5.QtCore import QUrl, QFileSystemWatcher
-from PyQt5.QtWidgets import (QAction, QApplication, QLineEdit, QMainWindow, QSizePolicy, QStyle, QTextEdit)
+from PyQt5.QtCore import QCoreApplication, QUrl, QFileSystemWatcher, pyqtSlot
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QApplication, QShortcut
 from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
 from PyQt5.QtWebKitWidgets import QWebPage, QWebView
 
@@ -80,6 +81,17 @@ class WebkitView(QWebView):
       self.load(QUrl('http://localhost:'+str(self.port)))
       # self.show()
 
+      self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
+      self.shortcut.activated.connect(self.on_quit)
+
+      self.show()
+
+   @pyqtSlot()
+   def on_quit(self):
+     print("Quit!")
+     QCoreApplication.instance().quit()
+
+
 
 # class MainWindow():
 #    def __init__(self, )
@@ -91,11 +103,10 @@ def main():
    server = Server()
    compiler = Compiler()
    webkitview = WebkitView(server.port)
-   webkitview.show()
+
+   sys.exit(app.exec_())
 
 
-   # sys.exit(app.exec_())
-   app.exec_()
 
 if __name__ == "__main__":
    main()
