@@ -45,6 +45,7 @@ class Server():
 
       self.httpd = http.server.HTTPServer(('', self.port), http.server.SimpleHTTPRequestHandler)
       self.thread = threading.Thread(target=self.httpd.serve_forever)
+      self.thread.daemon = True
       self.thread.start()
       print("serving at port", self._port)
 
