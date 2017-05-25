@@ -18,13 +18,17 @@ import threading
 
 from PyQt5.QtCore import QCoreApplication, QUrl, QFileSystemWatcher, pyqtSlot
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QWidget, QApplication, QShortcut, QGridLayout
+from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget
 # from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
 
 import sass
 
+class Core():
+   def __init__(self, parent=None):
+      self.server = Server()
+      self.compiler = Compiler()
 
 class Server():
 
@@ -77,16 +81,66 @@ class WebkitView(QWebView):
       self.port = port
       # QT webkit
       self.view = QWebView.__init__(self)
-      # browser.settings().setAttribute(QWebSettings.PluginsEnabled, True)
 
       self.load(QUrl('http://localhost:'+str(self.port)))
       # self.show()
 
+      self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
+      # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
+      # self.show()
+
+
+class WebkitInspector(QWebInspector):
+   def __init__(self, webkitview):
+      super().__init__()
+      self.webkitview = webkitview
+      self.setPage(self.webkitview.page())
+
+class ViewTab(QWidget):
+   def __init__(self, core):
+      super(ViewTab, self).__init__()
+
+
+      webkitview = WebkitView(core.server.port)
+
+      webkitinspector = WebkitInspector(webkitview)
+
+      self.grid = QGridLayout()
+      self.setLayout(self.grid)
+      self.grid.addWidget(webkitview, 1, 0)
+      self.grid.addWidget(webkitinspector, 2, 0)
+
+
+class MainWindow(QMainWindow):
+   def __init__(self, core):
+      super(MainWindow, self).__init__()
+
+      self.win = QWidget()
+      self.setCentralWidget(self.win)
+
+      self.grid = QGridLayout()
+      # self.grid.setContentsMargin(0,0,0,0);
+
+      self.win.setLayout(self.grid)
+
+      # label1 = QLabel("Example content contained in a tab.")
+      viewtab = ViewTab(core)
+      contenttab = QLabel("Content (markdown editor).")
+      versiontab = QLabel("Version (git).")
+
+      tabwidget = QTabWidget()
+      tabwidget.addTab(viewtab, "View")
+      tabwidget.addTab(contenttab, "Content")
+      tabwidget.addTab(versiontab, "Version")
+
+      self.grid.addWidget(tabwidget, 0, 0)
+
+
       self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
       self.shortcut.activated.connect(self.on_quit)
 
-      self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
-      # self.show()
+
+      self.show()
 
    @pyqtSlot()
    def on_quit(self):
@@ -94,30 +148,12 @@ class WebkitView(QWebView):
      QCoreApplication.instance().quit()
 
 
-
-# class MainWindow():
-#    def __init__(self, )
-
 def main():
    # app = QtCore.QCoreApplication(sys.argv)
    app = QApplication(sys.argv)
+   core = Core()
 
-   server = Server()
-   compiler = Compiler()
-
-   grid = QGridLayout()
-
-   webkitview = WebkitView(server.port)
-   grid.addWidget(webkitview, 1, 0)
-
-   webkitinspector = QWebInspector()
-   webkitinspector.setPage(webkitview.page())
-   grid.addWidget(webkitinspector, 2, 0)
-
-   # main app window
-   main_frame = QWidget()
-   main_frame.setLayout(grid)
-   main_frame.show()
+   mainappwindow = MainWindow(core)
 
    sys.exit(app.exec_())
 
