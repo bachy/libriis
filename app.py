@@ -83,6 +83,7 @@ class WebkitView(QWebView):
       self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
       # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
 
+
 class WebkitInspector(QWebInspector):
    def __init__(self, webkitview):
       super().__init__()
@@ -96,6 +97,7 @@ class ViewTab(QWidget):
 
       # self.grid = QGridLayout()
       hbox = QHBoxLayout()
+      hbox.setContentsMargins(0,0,0,0)
       self.setLayout(hbox)
 
 
@@ -115,6 +117,7 @@ class ViewTab(QWidget):
       hsplitter.addWidget(self.codeeditor)
 
       hbox.addWidget(hsplitter)
+
 
    def onChanged(self, text):
       print("ViewTba Layout Changed")
@@ -138,13 +141,21 @@ class MainWindow(QMainWindow):
 
 
       self.tabwidget = QTabWidget()
-      # self.tabwidget.setStyleSheet("""
-      #   .QWidget {
-      #       border: 1px solid black;
-      #       margin:0;
-      #       padding:0;
-      #       }
-      #   """)
+      # self.tabwidget.setContentsMargins(0,0,0,0)
+      self.tabwidget.setStyleSheet("""
+         QTabWidget::pane {
+            border:0px solid inherted;
+            margin:0px;
+            padding:0px;
+            }
+         QTabBar::tab {
+            padding: 4px;
+            font-size:12px;
+         }
+         QTabBar::tab:selected {
+            font-weight:bold;
+         }
+        """)
 
       self.viewtab = ViewTab(core)
       self.contenttab = QLabel("Content (markdown editor).")
