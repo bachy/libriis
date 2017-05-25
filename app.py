@@ -17,7 +17,7 @@ import http.server
 import threading
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QCoreApplication, QUrl, QFileSystemWatcher, pyqtSlot
+from PyQt5.QtCore import QCoreApplication, QUrl, QFileSystemWatcher, pyqtSlot, QSettings
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle
 # from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
@@ -30,6 +30,7 @@ class Core():
    def __init__(self, parent=None):
       self.server = Server()
       self.compiler = Compiler()
+      self.settings = QSettings('FiguresLibres', 'Cascade')
 
 class Server():
 
@@ -52,7 +53,6 @@ class Server():
    def port(self):
         return self._port
 
-
 class Compiler():
    def __init__(self,parent=None):
       paths = [
@@ -74,7 +74,6 @@ class Compiler():
       with open('assets/scss/main.css', 'w') as fp:
          fp.write(scss.decode('utf8'))
 
-
 class WebkitView(QWebView):
    def __init__(self, port):
       self.port = port
@@ -82,7 +81,6 @@ class WebkitView(QWebView):
       self.load(QUrl('http://localhost:'+str(self.port)))
       self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
       # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
-
 
 class WebkitInspector(QWebInspector):
    def __init__(self, webkitview):
@@ -122,12 +120,15 @@ class ViewTab(QWidget):
       self.lbl.setText(text)
       self.lbl.adjustSize()
 
-
 class MainWindow(QMainWindow):
    def __init__(self, core):
       super(MainWindow, self).__init__()
 
-      self.setWindowFlags(QtCore.Qt.WindowTitleHint)
+      self.core = core
+
+      self.restorePreferences()
+
+      # self.setWindowFlags(QtCore.Qt.WindowTitleHint)
       # QtCore.Qt.CustomizeWindowHint
       # | QtCore.Qt.Tool
       #  | QtCore.Qt.FramelessWindowHint
@@ -136,7 +137,6 @@ class MainWindow(QMainWindow):
 
 
       self.tabwidget = QTabWidget()
-
       # self.tabwidget.setStyleSheet("""
       #   .QWidget {
       #       border: 1px solid black;
@@ -162,19 +162,30 @@ class MainWindow(QMainWindow):
 
       self.show()
 
+   def restorePreferences(self):
+      try:
+         self.resize(self.core.settings.value('mainwindow/size', QtCore.QSize(1024, 768)))
+         self.move(self.core.settings.value('mainwindow/pos', QtCore.QPoint(0, 0)))
+      except:
+         pass
+
+   def savePreferences(self):
+      self.core.settings.beginGroup("mainwindow")
+      self.core.settings.setValue('size', self.size())
+      self.core.settings.setValue('pos', self.pos())
+      self.core.settings.endGroup()
+
    @pyqtSlot()
    def on_quit(self):
      print("Quit!")
+     self.savePreferences()
      QCoreApplication.instance().quit()
 
 
 def main():
-   # app = QtCore.QCoreApplication(sys.argv)
    app = QApplication(sys.argv)
    core = Core()
-
    mainappwindow = MainWindow(core)
-
    sys.exit(app.exec_())
 
 
