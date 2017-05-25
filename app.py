@@ -16,9 +16,10 @@ import socketserver
 import http.server
 import threading
 
+from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication, QUrl, QFileSystemWatcher, pyqtSlot
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget
+from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle
 # from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
@@ -60,17 +61,15 @@ class Compiler():
          'assets/scss/styles.scss'
       ]
       self.fs_watcher = QFileSystemWatcher(paths)
-      self.fs_watcher.directoryChanged.connect(self.directory_changed)
+      # self.fs_watcher.directoryChanged.connect(self.directory_changed)
       self.fs_watcher.fileChanged.connect(self.compile_scss)
-      # self.compile_scss()
+      self.compile_scss()
 
-
-   def directory_changed(path):
-      print("Directory changed : %s" % path)
+   # def directory_changed(path):
+   #    print("Directory changed : %s" % path)
 
    def compile_scss(path = ""):
       print("compiling sass : %s" % path)
-      # src = open( 'assets/scss/main.scss' ).read()
       scss = sass.compile_file(b'assets/scss/main.scss')
       with open('assets/scss/main.css', 'w') as fp:
          fp.write(scss.decode('utf8'))
@@ -79,15 +78,10 @@ class Compiler():
 class WebkitView(QWebView):
    def __init__(self, port):
       self.port = port
-      # QT webkit
       self.view = QWebView.__init__(self)
-
       self.load(QUrl('http://localhost:'+str(self.port)))
-      # self.show()
-
       self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
       # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
-      # self.show()
 
 
 class WebkitInspector(QWebInspector):
@@ -95,46 +89,72 @@ class WebkitInspector(QWebInspector):
       super().__init__()
       self.webkitview = webkitview
       self.setPage(self.webkitview.page())
+      # TODO: webkitinspector is disappearing when chaging tabs
 
 class ViewTab(QWidget):
    def __init__(self, core):
       super(ViewTab, self).__init__()
 
+      # self.grid = QGridLayout()
+      hbox = QHBoxLayout()
+      self.setLayout(hbox)
 
-      webkitview = WebkitView(core.server.port)
 
-      webkitinspector = WebkitInspector(webkitview)
+      # webviewbox = QVBoxLayout()
+      vsplitter = QSplitter(QtCore.Qt.Vertical)
 
-      self.grid = QGridLayout()
-      self.setLayout(self.grid)
-      self.grid.addWidget(webkitview, 1, 0)
-      self.grid.addWidget(webkitinspector, 2, 0)
+      self.webkitview = WebkitView(core.server.port)
+      vsplitter.addWidget(self.webkitview)
+
+      self.webkitinspector = WebkitInspector(self.webkitview)
+      vsplitter.addWidget(self.webkitinspector)
+
+      hsplitter = QSplitter(QtCore.Qt.Horizontal)
+      hsplitter.addWidget(vsplitter)
+
+      self.codeeditor = QLabel("Code Editor (SCSS & JS)")
+      hsplitter.addWidget(self.codeeditor)
+
+      hbox.addWidget(hsplitter)
+
+   def onChanged(self, text):
+      print("ViewTba Layout Changed")
+      self.lbl.setText(text)
+      self.lbl.adjustSize()
 
 
 class MainWindow(QMainWindow):
    def __init__(self, core):
       super(MainWindow, self).__init__()
 
-      self.win = QWidget()
-      self.setCentralWidget(self.win)
+      self.setWindowFlags(QtCore.Qt.WindowTitleHint)
+      # QtCore.Qt.CustomizeWindowHint
+      # | QtCore.Qt.Tool
+      #  | QtCore.Qt.FramelessWindowHint
+      #  | QtCore.Qt.WindowTitleHint
+      #  | QtCore.Qt.WindowStaysOnTopHint
 
-      self.grid = QGridLayout()
-      # self.grid.setContentsMargin(0,0,0,0);
 
-      self.win.setLayout(self.grid)
+      self.tabwidget = QTabWidget()
 
-      # label1 = QLabel("Example content contained in a tab.")
-      viewtab = ViewTab(core)
-      contenttab = QLabel("Content (markdown editor).")
-      versiontab = QLabel("Version (git).")
+      # self.tabwidget.setStyleSheet("""
+      #   .QWidget {
+      #       border: 1px solid black;
+      #       margin:0;
+      #       padding:0;
+      #       }
+      #   """)
 
-      tabwidget = QTabWidget()
-      tabwidget.addTab(viewtab, "View")
-      tabwidget.addTab(contenttab, "Content")
-      tabwidget.addTab(versiontab, "Version")
+      self.viewtab = ViewTab(core)
+      self.contenttab = QLabel("Content (markdown editor).")
+      self.versiontab = QLabel("Version (git).")
 
-      self.grid.addWidget(tabwidget, 0, 0)
 
+      self.tabwidget.addTab(self.viewtab, "View")
+      self.tabwidget.addTab(self.contenttab, "Content")
+      self.tabwidget.addTab(self.versiontab, "Version")
+
+      self.setCentralWidget(self.tabwidget)
 
       self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
       self.shortcut.activated.connect(self.on_quit)
