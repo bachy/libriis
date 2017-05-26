@@ -9,12 +9,12 @@
 # @Last modified time: 21-04-2017
 # @License: GPL-V3
 
-import sys, os, shutil
+import sys, os, shutil, tempfile
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication, QUrl, pyqtSlot, QSettings
 from PyQt5.QtGui import QIcon, QKeySequence, QFont, QSyntaxHighlighter
-from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle, QPlainTextEdit, QInputDialog, QLineEdit, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle, QPlainTextEdit, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QPushButton
 # from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
@@ -26,9 +26,71 @@ from classes import server, compiler, view, content
 
 class Core():
    def __init__(self, parent=None):
-      self.server = server.Server()
-      self.compiler = compiler.Compiler()
-      self.settings = QSettings('FiguresLibres', 'Cascade')
+      # restore previous preferences
+
+      self.restorePreferences()
+
+      self.temp = tempfile.mkdtemp()
+      # print(self.temp)
+
+      self.tempcwd = False
+      if(self.cwd == None or not os.path.isdir(self.cwd)):
+         self.cwd = os.path.join(self.temp, 'cwd')
+         self.tempcwd = True
+         self.initnewproject()
+
+
+      self.server = server.Server(self.temp)
+      self.compiler = compiler.Compiler(self.temp)
+
+
+   def restorePreferences(self):
+      # print("restorePreferences")
+      settings = QSettings('FiguresLibres', 'Cascade')
+      # settings.clear()
+      # print(settings.allKeys())
+
+      self.cwd = settings.value('core/cwd', None)
+      self.mw_size = settings.value('mainwindow/size', QtCore.QSize(1024, 768))
+      self.mw_pos = settings.value('mainwindow/pos', QtCore.QPoint(0, 0))
+
+
+   def savePreferences(self):
+      # print("savePreferences")
+      settings = QSettings('FiguresLibres', 'Cascade')
+      # print(settings.allKeys())
+
+      if not self.tempcwd:
+         settings.setValue('core/cwd', self.cwd)
+
+      settings.setValue('mainwindow/size', self.mainwindow.size())
+      settings.setValue('mainwindow/pos', self.mainwindow.pos())
+
+   def initnewproject(self, cwd = None):
+      if cwd == None :
+         cwd = self.cwd
+      else :
+         self.cwd = cwd
+
+      shutil.copytree('templates/newproject', cwd)
+      self.prefs = json.loads(open(os.path.join(cwd,'.config/prefs.json')).read())
+      self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
+      self.repository = git.Repo.init(cwd)
+      self.repository.index.add(['assets','contents','.config'])
+      self.repository.index.commit("initial commit")
+      # TODO: set mdtohtml compiler from project md to app index.html
+      # TODO: embed project styles.scss to app scss frame work
+
+   def saveproject(self, cwd = None):
+      if not cwd == None and self.tempcwd:
+         shutil.copytree(self.cwd, cwd)
+         self.cwd = cwd
+         self.tempcwd = False
+
+   def quit(self):
+      self.savePreferences()
+      shutil.rmtree(self.temp, ignore_errors=True)
+      QCoreApplication.instance().quit()
 
 class MainWindow(QMainWindow):
    def __init__(self, core):
@@ -36,18 +98,18 @@ class MainWindow(QMainWindow):
 
       # load core class
       self.core = core
-      # restore previous preferences
-      self.restorePreferences()
 
       self.setWindowTitle("Cascade")
       self.setWindowIcon(QIcon('assets/images/icon.png'))
+
+      self.resize(self.core.mw_size)
+      self.move(self.core.mw_pos)
 
       self.initMenuBar()
 
       self.initTabs()
       # self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
       # self.shortcut.activated.connect(self.quit)
-
 
       self.show()
 
@@ -64,6 +126,12 @@ class MainWindow(QMainWindow):
       open.setShortcut("Ctrl+o")
       file.addAction(open)
 
+      self.save_action = QAction("&Save",self)
+      self.save_action.setShortcut("Ctrl+s")
+      file.addAction(self.save_action)
+      if not self.core.tempcwd:
+         self.save_action.setEnabled(False)
+
       quit = QAction("&Quit",self)
       quit.setShortcut("Ctrl+q")
       file.addAction(quit)
@@ -74,44 +142,57 @@ class MainWindow(QMainWindow):
       edit.addAction("copy")
       edit.addAction("paste")
 
-
    def processtrigger(self, q):
       print(q.text()+" is triggered")
       if q.text() == "&New Project":
          self.newprojectdialogue()
       elif q.text() == "&Open":
-         self.opendialogue()
+         self.openprojectdialogue()
+      elif q.text() == "&Save":
+         self.saveprojectdialogue()
       elif q.text() == "&Quit":
          self.quit()
 
-   def opendialogue(self):
+   def openprojectdialogue(self):
       print("open")
 
    def newprojectdialogue(self):
-      projectname = QFileDialog.getSaveFileName(self, 'Dialog Title', '')
+      projectname = QFileDialog.getSaveFileName(self, 'New Project', '')
       # TODO: no file type
-      if not os.path.isdir(projectname[0]):
-         self.core.cwd = projectname[0]
-         self.initnewproject()
-      else:
-         print("folder already exists")
-         # TODO: check if is cascade folder
+      try:
+         if not os.path.isdir(projectname[0]):
+            self.core.initnewproject(projectname[0])
+         else:
+            print("folder already exists")
+            # TODO: check if is cascade folder
+      except Exception as e:
+         pass
 
-   def initnewproject(self):
-      shutil.copytree('templates/newproject', self.core.cwd)
-      self.core.prefs = json.loads(open(os.path.join(self.core.cwd,'.config/prefs.json')).read())
-      self.core.summary = json.loads(open(os.path.join(self.core.cwd,'.config/summary.json')).read())
-      # TODO: init git repos
-      self.core.repository = git.Repo.init(self.core.cwd)
-      self.core.repository.index.add(['assets','contents','.config'])
-      self.core.repository.index.commit("initial commit")
-      # TODO: set mdtohtml compiler from project md to app index.html
-      # TODO: embed project styles.scss to app scss frame work
+   def saveprojectdialogue(self, quit=False):
+      projectname = QFileDialog.getSaveFileName(self, 'Save Project', '')
+      # TODO: no file type
+      try:
+         if not os.path.isdir(projectname[0]):
+            self.core.saveproject(projectname[0])
+            self.save_action.setEnabled(False)
+            if quit:
+               self.quit()
+         else:
+            print("folder already exists")
+            # TODO: check if is cascade folder
+      except Exception as e:
+         pass
 
    def quit(self):
-     print("Quit")
-     self.savePreferences()
-     QCoreApplication.instance().quit()
+      print("Quit")
+      if self.core.tempcwd:
+         buttonReply = QMessageBox.question(self, 'Project Not Saved', "Do you want to save your current project before quiting?", QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
+         if buttonReply == QMessageBox.Yes:
+            self.saveprojectdialogue(quit=True)
+         if buttonReply == QMessageBox.No:
+            self.core.quit()
+      else:
+         self.core.quit()
 
    def initTabs(self):
       self.tabwidget = QTabWidget()
@@ -131,8 +212,8 @@ class MainWindow(QMainWindow):
          }
         """)
 
-      self.viewtab = view.ViewTab(core)
-      self.contenttab = content.ContentTab(core)
+      self.viewtab = view.ViewTab(self.core)
+      self.contenttab = content.ContentTab(self.core)
       self.versiontab = QLabel("Version (git).")
 
 
@@ -143,25 +224,11 @@ class MainWindow(QMainWindow):
       self.setCentralWidget(self.tabwidget)
 
 
-   def restorePreferences(self):
-      try:
-         self.resize(self.core.settings.value('mainwindow/size', QtCore.QSize(1024, 768)))
-         self.move(self.core.settings.value('mainwindow/pos', QtCore.QPoint(0, 0)))
-      except:
-         pass
-
-   def savePreferences(self):
-      self.core.settings.beginGroup("mainwindow")
-      self.core.settings.setValue('size', self.size())
-      self.core.settings.setValue('pos', self.pos())
-      self.core.settings.setValue('cwd', self.core.cwd)
-      self.core.settings.endGroup()
-
-
 def main():
    app = QApplication(sys.argv)
    core = Core()
    mainappwindow = MainWindow(core)
+   core.mainwindow = mainappwindow
    sys.exit(app.exec_())
 
 
