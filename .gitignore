@@ -1,3 +1,4 @@
 assets/scss/*.css
 assets/images
 _index.html
+classes/__pycache__
