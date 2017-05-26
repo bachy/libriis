@@ -44,42 +44,7 @@ class MainWindow(QMainWindow):
 
       self.initMenuBar()
 
-      # self.setWindowFlags(QtCore.Qt.WindowTitleHint)
-      # QtCore.Qt.CustomizeWindowHint
-      # | QtCore.Qt.Tool
-      #  | QtCore.Qt.FramelessWindowHint
-      #  | QtCore.Qt.WindowTitleHint
-      #  | QtCore.Qt.WindowStaysOnTopHint
-
-
-      self.tabwidget = QTabWidget()
-      # self.tabwidget.setContentsMargins(0,0,0,0)
-      self.tabwidget.setStyleSheet("""
-         QTabWidget::pane {
-            border:0px solid inherted;
-            margin:0px;
-            padding:0px;
-            }
-         QTabBar::tab {
-            padding: 4px;
-            font-size:12px;
-         }
-         QTabBar::tab:selected {
-            font-weight:bold;
-         }
-        """)
-
-      self.viewtab = view.ViewTab(core)
-      self.contenttab = content.ContentTab(core)
-      self.versiontab = QLabel("Version (git).")
-
-
-      self.tabwidget.addTab(self.viewtab, "View")
-      self.tabwidget.addTab(self.contenttab, "Content")
-      self.tabwidget.addTab(self.versiontab, "Version")
-
-      self.setCentralWidget(self.tabwidget)
-
+      self.initTabs()
       # self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
       # self.shortcut.activated.connect(self.quit)
 
@@ -147,6 +112,36 @@ class MainWindow(QMainWindow):
      print("Quit")
      self.savePreferences()
      QCoreApplication.instance().quit()
+
+   def initTabs(self):
+      self.tabwidget = QTabWidget()
+      # self.tabwidget.setContentsMargins(0,0,0,0)
+      self.tabwidget.setStyleSheet("""
+         QTabWidget::pane {
+            border:0px solid inherted;
+            margin:0px;
+            padding:0px;
+            }
+         QTabBar::tab {
+            padding: 4px;
+            font-size:12px;
+         }
+         QTabBar::tab:selected {
+            font-weight:bold;
+         }
+        """)
+
+      self.viewtab = view.ViewTab(core)
+      self.contenttab = content.ContentTab(core)
+      self.versiontab = QLabel("Version (git).")
+
+
+      self.tabwidget.addTab(self.viewtab, "View")
+      self.tabwidget.addTab(self.contenttab, "Content")
+      self.tabwidget.addTab(self.versiontab, "Version")
+
+      self.setCentralWidget(self.tabwidget)
+
 
    def restorePreferences(self):
       try:
