@@ -13,7 +13,7 @@ import sys, os, shutil
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication, QUrl, pyqtSlot, QSettings
-from PyQt5.QtGui import QKeySequence, QFont, QSyntaxHighlighter
+from PyQt5.QtGui import QIcon, QKeySequence, QFont, QSyntaxHighlighter
 from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle, QPlainTextEdit, QInputDialog, QLineEdit, QFileDialog
 # from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
 from PyQt5.QtWebKit import QWebSettings
@@ -40,6 +40,7 @@ class MainWindow(QMainWindow):
       self.restorePreferences()
 
       self.setWindowTitle("Cascade")
+      self.setWindowIcon(QIcon('assets/images/icon.png'))
 
       self.initMenuBar()
 
