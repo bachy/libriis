@@ -20,6 +20,7 @@ from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
 
 import json
+import git
 
 from classes import server, compiler, view, content
 
@@ -135,6 +136,11 @@ class MainWindow(QMainWindow):
       self.core.prefs = json.loads(open(os.path.join(self.core.cwd,'.config/prefs.json')).read())
       self.core.summary = json.loads(open(os.path.join(self.core.cwd,'.config/summary.json')).read())
       # TODO: init git repos
+      self.core.repository = git.Repo.init(self.core.cwd)
+      self.core.repository.index.add(['assets','contents','.config'])
+      self.core.repository.index.commit("initial commit")
+      # TODO: set mdtohtml compiler from project md to app index.html
+      # TODO: embed project styles.scss to app scss frame work
 
    def quit(self):
      print("Quit")
