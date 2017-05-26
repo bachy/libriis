@@ -65,7 +65,8 @@ class Core():
 
       settings.setValue('mainwindow/size', self.mainwindow.size())
       settings.setValue('mainwindow/pos', self.mainwindow.pos())
-
+      # TODO: save splitters pos
+      
    def initnewproject(self, cwd = None):
       if cwd == None :
          cwd = self.cwd
