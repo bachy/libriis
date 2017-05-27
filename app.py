@@ -14,7 +14,7 @@ import sys, os, shutil, tempfile
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication, QUrl, pyqtSlot, QSettings
 from PyQt5.QtGui import QIcon, QKeySequence, QFont, QSyntaxHighlighter
-from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle, QPlainTextEdit, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QApplication, QShortcut, QGridLayout, QLabel, QTabWidget, QStackedWidget, QHBoxLayout, QVBoxLayout, QSplitter, QSplitterHandle, QPlainTextEdit, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QPushButton
 # from PyQt5.QtNetwork import QNetworkProxyFactory, QNetworkRequest
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
@@ -66,7 +66,7 @@ class Core():
       settings.setValue('mainwindow/size', self.mainwindow.size())
       settings.setValue('mainwindow/pos', self.mainwindow.pos())
       # TODO: save splitters pos
-      
+
    def initnewproject(self, cwd = None):
       if cwd == None :
          cwd = self.cwd
@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
 
       self.initMenuBar()
 
-      self.initTabs()
+      self.initMainStack()
       # self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
       # self.shortcut.activated.connect(self.quit)
 
@@ -137,13 +137,33 @@ class MainWindow(QMainWindow):
       quit.setShortcut("Ctrl+q")
       file.addAction(quit)
 
-      file.triggered[QAction].connect(self.processtrigger)
+      file.triggered[QAction].connect(self.onfilemenutrigger)
 
+      # edit menu
       edit = bar.addMenu("Edit")
       edit.addAction("copy")
       edit.addAction("paste")
+      edit.addAction("preferences")
 
-   def processtrigger(self, q):
+      # view menu
+      view = bar.addMenu("&View")
+
+      designview = QAction("&Design",self)
+      designview.setShortcut("F1")
+      view.addAction(designview)
+
+      contentview = QAction("&Content",self)
+      contentview.setShortcut("F2")
+      view.addAction(contentview)
+
+      versionview = QAction("&Version",self)
+      versionview.setShortcut("F3")
+      view.addAction(versionview)
+
+      view.triggered[QAction].connect(self.onviewmenutrigger)
+
+
+   def onfilemenutrigger(self, q):
       print(q.text()+" is triggered")
       if q.text() == "&New Project":
          self.newprojectdialogue()
@@ -195,34 +215,44 @@ class MainWindow(QMainWindow):
       else:
          self.core.quit()
 
-   def initTabs(self):
-      self.tabwidget = QTabWidget()
+   def onviewmenutrigger(self, q):
+      print(q.text()+" is triggered")
+      if q.text() == "&Design":
+         self.mainstack.setCurrentIndex(0)
+      elif q.text() == "&Content":
+         self.mainstack.setCurrentIndex(1)
+      elif q.text() == "&Version":
+         self.mainstack.setCurrentIndex(2)
+
+
+   def initMainStack(self):
+      self.mainstack = QStackedWidget()
       # self.tabwidget.setContentsMargins(0,0,0,0)
-      self.tabwidget.setStyleSheet("""
-         QTabWidget::pane {
-            border:0px solid inherted;
-            margin:0px;
-            padding:0px;
-            }
-         QTabBar::tab {
-            padding: 4px;
-            font-size:12px;
-         }
-         QTabBar::tab:selected {
-            font-weight:bold;
-         }
-        """)
+      # self.tabwidget.setStyleSheet("""
+      #    QTabWidget::pane {
+      #       border:0px solid inherted;
+      #       margin:0px;
+      #       padding:0px;
+      #       }
+      #    QTabBar::tab {
+      #       padding: 4px;
+      #       font-size:12px;
+      #    }
+      #    QTabBar::tab:selected {
+      #       font-weight:bold;
+      #    }
+      #   """)
 
-      self.viewtab = view.ViewTab(self.core)
-      self.contenttab = content.ContentTab(self.core)
-      self.versiontab = QLabel("Version (git).")
+      self.viewstack = view.ViewStack(self.core)
+      self.contentstack = content.ContentStack(self.core)
+      self.versionstack = QLabel("Version (git).")
 
 
-      self.tabwidget.addTab(self.viewtab, "View")
-      self.tabwidget.addTab(self.contenttab, "Content")
-      self.tabwidget.addTab(self.versiontab, "Version")
+      self.mainstack.addWidget(self.viewstack)
+      self.mainstack.addWidget(self.contentstack)
+      self.mainstack.addWidget(self.versionstack)
 
-      self.setCentralWidget(self.tabwidget)
+      self.setCentralWidget(self.mainstack)
 
 
 def main():

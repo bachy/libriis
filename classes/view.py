@@ -37,9 +37,9 @@ class CodeEditor(QPlainTextEdit):
       # https://pypi.python.org/pypi/QScintilla/2.9.2
 
 
-class ViewTab(QWidget):
+class ViewStack(QWidget):
    def __init__(self, core):
-      super(ViewTab, self).__init__()
+      super(ViewStack, self).__init__()
 
       # self.grid = QGridLayout()
       hbox = QHBoxLayout()
@@ -65,7 +65,7 @@ class ViewTab(QWidget):
       hbox.addWidget(hsplitter)
 
 
-   def onChanged(self, text):
-      print("ViewTba Layout Changed")
-      self.lbl.setText(text)
-      self.lbl.adjustSize()
+   # def onChanged(self, text):
+   #    print("ViewTba Layout Changed")
+   #    self.lbl.setText(text)
+   #    self.lbl.adjustSize()

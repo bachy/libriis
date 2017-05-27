@@ -12,9 +12,9 @@ class Summary(QLabel):
 
 
 
-class ContentTab(QWidget):
+class ContentStack(QWidget):
    def __init__(self, core):
-      super(ContentTab, self).__init__()
+      super(ContentStack, self).__init__()
 
       # self.grid = QGridLayout()
       hbox = QHBoxLayout()
