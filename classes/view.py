@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys, os, re
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QFont, QSyntaxHighlighter
-from PyQt5.QtWidgets import QWidget, QLabel, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit
+from PyQt5.QtGui import QKeySequence, QFont, QSyntaxHighlighter
+from PyQt5.QtWidgets import QWidget, QLabel, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 
@@ -27,9 +27,42 @@ class WebkitInspector(QWebInspector):
       self.setPage(self.webkitview.page())
       # TODO: webkitinspector is disappearing when chaging tabs
 
-class CodeEditor(QWidget):
-   def __init__(self, core):
+class CodeEditor(QPlainTextEdit):
+   def __init__(self, core, tabs, file=None):
       super(CodeEditor, self).__init__()
+      self.core = core
+      self.tabs = tabs
+      # self.file = file
+      self.file = os.path.join(self.core.cwd,file)
+
+      self.insertPlainText(open(self.file, 'r').read())
+      self.changed = False
+      self.textChanged.connect(self.onTextChanged)
+
+      self.shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
+      self.shortcut.activated.connect(self.save)
+
+   def onTextChanged(self):
+      # print('textChanged')
+      # print(self.toPlainText())
+      # open(self.file, 'w').write(self.toPlainText())
+      if not self.changed:
+         self.changed = True
+         i = self.tabs.currentIndex()
+         self.tabs.setTabText(i, "* "+self.tabs.tabText(i))
+
+   def save(self):
+      if self.changed:
+         open(self.file, 'w').write(self.toPlainText())
+         i = self.tabs.currentIndex()
+         self.tabs.setTabText(i, re.sub(r'^\*\s', '', self.tabs.tabText(i)))
+         self.changed = False
+         # TODO: how to combine file save and project save
+
+
+class Editor(QWidget):
+   def __init__(self, core):
+      super(Editor, self).__init__()
       self.core = core
 
       self.layout = QVBoxLayout(self)
@@ -38,16 +71,8 @@ class CodeEditor(QWidget):
       # Initialize tab screen
       self.tabs = QTabWidget()
 
-      self.scsstab = QPlainTextEdit()
-      self.scssfile = open(os.path.join(self.core.cwd,'assets/scss/styles.scss'))
-      scssstr = self.scssfile.read()
-      self.scsstab.insertPlainText(scssstr)
-
-      self.jstab = QPlainTextEdit()
-      self.jsfile = open(os.path.join(self.core.cwd,'assets/js/script.js'))
-      jsstr = self.jsfile.read()
-      self.jstab.insertPlainText(jsstr)
-
+      self.scsstab = CodeEditor(core, self.tabs, 'assets/scss/styles.scss')
+      self.jstab = CodeEditor(core, self.tabs, 'assets/js/script.js')
 
       # Add tabs
       self.tabs.addTab(self.scsstab,"scss")
@@ -88,8 +113,8 @@ class ViewStack(QWidget):
       hsplitter = QSplitter(QtCore.Qt.Horizontal)
       hsplitter.addWidget(vsplitter)
 
-      self.codeeditor = CodeEditor(core)
-      hsplitter.addWidget(self.codeeditor)
+      self.editor = Editor(core)
+      hsplitter.addWidget(self.editor)
 
       hbox.addWidget(hsplitter)
 

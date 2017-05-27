@@ -136,11 +136,11 @@ class MainWindow(QMainWindow):
       open.setShortcut("Ctrl+o")
       file.addAction(open)
 
-      self.save_action = QAction("&Save",self)
-      self.save_action.setShortcut("Ctrl+s")
+      self.save_action = QAction("&Save Project as",self)
+      self.save_action.setShortcut("Ctrl+Shift+s")
       file.addAction(self.save_action)
-      if not self.core.tempcwd:
-         self.save_action.setEnabled(False)
+      # if not self.core.tempcwd:
+      #    self.save_action.setEnabled(False)
 
       quit = QAction("&Quit",self)
       quit.setShortcut("Ctrl+q")
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
          self.newprojectdialogue()
       elif q.text() == "&Open":
          self.openprojectdialogue()
-      elif q.text() == "&Save":
+      elif q.text() == "&Save Project as":
          self.saveprojectdialogue()
       elif q.text() == "&Quit":
          self.quit()
@@ -204,7 +204,7 @@ class MainWindow(QMainWindow):
       try:
          if not os.path.isdir(projectname[0]):
             self.core.saveproject(projectname[0])
-            self.save_action.setEnabled(False)
+            # self.save_action.setEnabled(False)
             if quit:
                self.quit()
          else:
