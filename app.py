@@ -29,7 +29,7 @@ class Core():
       # restore previous preferences
 
       self.restorePreferences()
-
+      self._mw = False
       self.temp = tempfile.mkdtemp()
       # print(self.temp)
 
@@ -39,9 +39,19 @@ class Core():
          self.tempcwd = True
          self.initnewproject()
 
-
       self.server = server.Server(self.temp)
       self.compiler = compiler.Compiler(self.temp)
+
+   @property
+   def mainwindow(self):
+      return self.mainwindow
+
+   @mainwindow.setter
+   def mainwindow(self, mw):
+      if not self._mw:
+         self._mw = mw
+         if not self.tempcwd:
+            self._mw.setWindowTitle("Cascade – "+self.cwd)
 
 
    def restorePreferences(self):
@@ -87,6 +97,7 @@ class Core():
          shutil.copytree(self.cwd, cwd)
          self.cwd = cwd
          self.tempcwd = False
+         self._mw.setWindowTitle("Cascade – "+self.cwd)
 
    def quit(self):
       self.savePreferences()
@@ -109,8 +120,6 @@ class MainWindow(QMainWindow):
       self.initMenuBar()
 
       self.initMainStack()
-      # self.shortcut = QShortcut(QKeySequence("Ctrl+Q"), self)
-      # self.shortcut.activated.connect(self.quit)
 
       self.show()
 
