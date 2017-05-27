@@ -22,7 +22,7 @@ from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
 import json
 import git
 
-from classes import server, compiler, view, content
+from classes import server, compiler, design, content
 
 class Core():
    def __init__(self, parent=None):
@@ -252,12 +252,12 @@ class MainWindow(QMainWindow):
       #    }
       #   """)
 
-      self.viewstack = view.ViewStack(self.core)
+      self.designstack = design.DesignStack(self.core)
       self.contentstack = content.ContentStack(self.core)
       self.versionstack = QLabel("Version (git).")
 
 
-      self.mainstack.addWidget(self.viewstack)
+      self.mainstack.addWidget(self.designstack)
       self.mainstack.addWidget(self.contentstack)
       self.mainstack.addWidget(self.versionstack)
 
