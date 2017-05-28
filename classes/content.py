@@ -4,12 +4,15 @@
 import sys, os
 
 from PyQt5 import QtCore
+from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QFont, QSyntaxHighlighter
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListView, QAbstractItemView
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListWidget, QListWidgetItem, QAbstractItemView, QButtonGroup, QPushButton, QInputDialog
 
 import markdown
 import re
 import json
+
+# from classes import orderablelist
 
 
 class Summary(QWidget):
@@ -17,7 +20,8 @@ class Summary(QWidget):
       super(Summary, self).__init__()
       self.core = core
 
-      sum_json = open(os.path.join(self.core.cwd,'.config/summary.json')).read()
+      self.jsonfilepath = os.path.join(self.core.cwd,'.config/summary.json')
+      sum_json = open(self.jsonfilepath).read()
       self.sum = json.loads(sum_json)
 
       vbox = QVBoxLayout()
@@ -26,206 +30,117 @@ class Summary(QWidget):
       self.list = SummaryList(self)
       vbox.addWidget(self.list)
 
-      # self.actions = SummaryActions(self)
-      # self.addWidget(self.actions)
+      self.actions = SummaryActions(self, core)
+      vbox.addWidget(self.actions)
 
       self.setLayout(vbox)
 
-class SumListModel(QtCore.QAbstractListModel):
-   dragDropFinished = QtCore.pyqtSignal()
-   def __init__(self,sum):
-      QtCore.QAbstractItemModel.__init__(self)
-      self.nodes = ['node0', 'node1', 'node2', 'node3', 'node4', 'node5']
-      self.lastDroppedItems = []
-      self.pendingRemoveRowsAfterDrop = False
+   def addItem(self, text):
+      # file
+      filename = re.sub(r'\W', "_", text)+".md"
+      # TODO: check if file does not already exists
+      filepath = os.path.join(self.core.cwd,'contents',filename)
+      with open(filepath, 'w') as fp:
+         fp.write('#'+text)
+      # json
+      item = {"title":text,"file":filename}
+      self.sum.append(item)
+      with open(self.jsonfilepath, "w") as fp:
+         json.dump(self.sum, fp, ensure_ascii=False, indent="\t")
+      # refresh list
+      self.list.addNewItem(item)
 
-   def rowForItem(self, text):
-      '''
-      rowForItem method returns the row corresponding to the passed in item
-      or None if no such item exists in the model
-      '''
-      try:
-         row = self.nodes.index(text)
-      except ValueError:
-         return None
-      return row
+   def recordNewList(self):
 
-   def index(self, row, column, parent):
-      if row < 0 or row >= len(self.nodes):
-         return QtCore.QModelIndex()
-      return self.createIndex(row, column)
+      newdata = []
+      for i in range(0,self.list.count()):
+         # print(self.item(i).item['title'])
+         newdata.append(self.list.item(i).item)
 
-   def parent(self, index):
-      return QtCore.QModelIndex()
+      # print(newdata)
+      self.sum = newdata
+      with open(self.jsonfilepath, "w") as fp:
+         json.dump(newdata, fp, ensure_ascii=False, indent="\t")
 
-   def rowCount(self, index):
-      if index.isValid():
-         return 0
-      return len(self.nodes)
 
-   def data(self, index, role):
-      if not index.isValid():
-         return None
-      if role == QtCore.Qt.DisplayRole:
-         row = index.row()
-         if row < 0 or row >= len(self.nodes):
-             return None
-         return self.nodes[row]
-      else:
-         return None
-
-   def supportedDropActions(self):
-      return QtCore.Qt.MoveAction
-
-   def flags(self, index):
-      if not index.isValid():
-         return QtCore.Qt.ItemIsEnabled
-      return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | \
-            QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled
-
-   def insertRows(self, row, count, index):
-      if index.isValid():
-         return False
-      if count <= 0:
-         return False
-      # inserting 'count' empty rows starting at 'row'
-      self.beginInsertRows(QtCore.QModelIndex(), row, row + count - 1)
-      for i in range(0, count):
-         self.nodes.insert(row + i, '')
-      self.endInsertRows()
-      return True
-
-   def removeRows(self, row, count, index):
-      if index.isValid():
-         return False
-      if count <= 0:
-         return False
-      num_rows = self.rowCount(QtCore.QModelIndex())
-      self.beginRemoveRows(QtCore.QModelIndex(), row, row + count - 1)
-      for i in range(count, 0, -1):
-         self.nodes.pop(row - i + 1)
-      self.endRemoveRows()
-
-      if self.pendingRemoveRowsAfterDrop:
-         '''
-         If we got here, it means this call to removeRows is the automatic
-         'cleanup' action after drag-n-drop performed by Qt
-         '''
-         self.pendingRemoveRowsAfterDrop = False
-         self.dragDropFinished.emit()
-
-      return True
-
-   def setData(self, index, value, role):
-      if not index.isValid():
-         return False
-      if index.row() < 0 or index.row() > len(self.nodes):
-         return False
-      self.nodes[index.row()] = str(value)
-      self.dataChanged.emit(index, index)
-      return True
-
-   def mimeTypes(self):
-      return ['application/vnd.treeviewdragdrop.list']
-
-   def mimeData(self, indexes):
-      mimedata = QtCore.QMimeData()
-      encoded_data = QtCore.QByteArray()
-      stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.WriteOnly)
-      for index in indexes:
-         if index.isValid():
-             text = self.data(index, 0)
-      stream << QtCore.QByteArray(text.encode('utf-8'))
-      mimedata.setData('application/vnd.treeviewdragdrop.list', encoded_data)
-      return mimedata
-
-   def dropMimeData(self, data, action, row, column, parent):
-      if action == QtCore.Qt.IgnoreAction:
-         return True
-      if not data.hasFormat('application/vnd.treeviewdragdrop.list'):
-         return False
-      if column > 0:
-         return False
-
-      num_rows = self.rowCount(QtCore.QModelIndex())
-      if num_rows <= 0:
-         return False
-
-      if row < 0:
-         if parent.isValid():
-            row = parent.row()
-         else:
-            return False
-
-      encoded_data = data.data('application/vnd.treeviewdragdrop.list')
-      stream = QtCore.QDataStream(encoded_data, QtCore.QIODevice.ReadOnly)
-
-      new_items = []
-      rows = 0
-      while not stream.atEnd():
-         text = QtCore.QByteArray()
-         stream >> text
-         text = bytes(text).decode('utf-8')
-         index = self.nodes.index(text)
-         new_items.append((text, index))
-         rows += 1
-
-      self.lastDroppedItems = []
-      for (text, index) in new_items:
-         target_row = row
-         if index < row:
-            target_row += 1
-         self.beginInsertRows(QtCore.QModelIndex(), target_row, target_row)
-         self.nodes.insert(target_row, text)
-         self.endInsertRows()
-         self.lastDroppedItems.append(text)
-         row += 1
-
-      self.pendingRemoveRowsAfterDrop = True
-      return True
-
-class SumListSelectionModel(QtCore.QItemSelectionModel):
-   def __init__(self, parent=None):
-      QtCore.QItemSelectionModel.__init__(self, parent)
-
-   def onModelItemsReordered(self):
-      new_selection = QtCore.QItemSelection()
-      new_index = QtCore.QModelIndex()
-      for item in self.model().lastDroppedItems:
-         row = self.model().rowForItem(item)
-         if row is None:
-            continue
-         new_index = self.model().index(row, 0, QtCore.QModelIndex())
-         new_selection.select(new_index, new_index)
-
-      self.clearSelection()
-      flags = QtCore.QItemSelectionModel.ClearAndSelect | \
-              QtCore.QItemSelectionModel.Rows | \
-              QtCore.QItemSelectionModel.Current
-      self.select(new_selection, flags)
-      self.setCurrentIndex(new_index, flags)
-
-class SummaryList(QListView):
-   def __init__(self,prt):
-      super(SummaryList, self).__init__()
-      print("list")
-      self.prt = prt
-      model = SumListModel(sum)
-      selectionModel = SumListSelectionModel(model)
-      model.dragDropFinished.connect(selectionModel.onModelItemsReordered)
-      self.setModel(model)
-      self.setSelectionModel(selectionModel)
+class SummaryList(QListWidget):
+   def __init__(self, parent):
+      super(SummaryList, self).__init__(parent)
+      self.parent = parent
+      # self.sum = sum
+      # print(self.sum)
+      # self.setSortingEnabled(True)
+      self.setDragEnabled(True)
+      self.setSelectionMode(QAbstractItemView.SingleSelection)
+      self.setAcceptDrops(True)
+      self.setDropIndicatorShown(True)
       self.setDragDropMode(QAbstractItemView.InternalMove)
-      self.setDragDropOverwriteMode(False)
+
+      self.model().rowsMoved.connect(self.onRowsMoved)
+      print(self.model())
+
+      for item in self.parent.sum:
+         self.addNewItem(item)
+
+   def onRowsMoved(self, model, start, end, dest):
+      # print("onRowsMoved")
+      self.parent.recordNewList()
+
+   def addNewItem(self, item):
+      # slw = SummaryListWidgetItem(self,item)
+      # lwi = QListWidgetItem(self)
+      # # Set size hint
+      # lwi.setSizeHint(slw.sizeHint())
+      # self.addItem(lwi)
+      # self.setItemWidget(lwi, slw)
+      # # self.addItem(QListWidgetItem())
+      self.addItem(SummaryListWidgetItem(self,item))
+
+class SummaryListWidgetItem(QListWidgetItem):
+   def __init__(self,parent,item):
+      super(SummaryListWidgetItem, self).__init__(parent)
+      self.parent = parent
+      self.item = item
+
+      self.setText(item['title'])
+      self.setToolTip(item['file'])
 
 
 class SummaryActions(QWidget):
-   def __init__(self,sum):
-      print("actions")
-      # for p in self.sum:
+   def __init__(self,parent,core):
+      super(SummaryActions, self).__init__(parent)
 
-# class SummaryActions():
-#    def
+      self.parent = parent
+      self.core = core
+
+      self.hbox = QHBoxLayout()
+      self.hbox.setContentsMargins(0,0,0,0)
+
+      new = QPushButton("New Page", self)
+      new.setShortcut('Ctrl+Shift+n')
+      # new.setIcon(Icon(ico)))
+      new.clicked.connect(self.onAddPage)
+      self.hbox.addWidget(new)
+
+      delete = QPushButton("Delete Page", self)
+      delete.setShortcut('Ctrl+Shift+sup')
+      # delete.setIcon(Icon(ico)))
+      delete.clicked.connect(self.onDeletePage)
+      self.hbox.addWidget(delete)
+
+
+      self.setLayout(self.hbox)
+
+   def onAddPage(self):
+      text, ok = QInputDialog.getText(self, 'Input Dialog', 'Page Name:')
+      if ok:
+         self.parent.addItem(text)
+
+   def onDeletePage(self):
+      print("onDeletePage")
+      # TODO: get the current selected page
+      # TODO: ask for confirmation for deleting the current selecred page
+      # TODO: call for summary widget to delete the page
 
 class ContentStack(QWidget):
    def __init__(self, core):
@@ -236,15 +151,33 @@ class ContentStack(QWidget):
       hbox.setContentsMargins(0,0,0,0)
       self.setLayout(hbox)
 
-      hsplitter = QSplitter(QtCore.Qt.Horizontal)
+      self.hsplitter = QSplitter(QtCore.Qt.Horizontal)
 
       self.summary = Summary(core)
-      hsplitter.addWidget(self.summary)
+      self.hsplitter.addWidget(self.summary)
 
       self.mdsource = QLabel("Content (markdown src).")
-      hsplitter.addWidget(self.mdsource)
+      self.hsplitter.addWidget(self.mdsource)
 
       self.mdpreview = QLabel("Content (markdown preview).")
-      hsplitter.addWidget(self.mdpreview)
+      self.hsplitter.addWidget(self.mdpreview)
 
-      hbox.addWidget(hsplitter)
+      self.hsplitter.splitterMoved.connect(self.movedSplitter)
+
+      hbox.addWidget(self.hsplitter)
+
+      self.restorePrefs()
+
+
+   def restorePrefs(self):
+      settings = QSettings('FiguresLibres', 'Cascade')
+      vals = settings.value('content/hsplitter/sizes', None)
+      if vals:
+         sizes = []
+         for size in vals: sizes.append(int(size))
+         self.hsplitter.setSizes(sizes)
+
+   def movedSplitter(self):
+      settings = QSettings('FiguresLibres', 'Cascade')
+      # print(self.hsplitter.sizes())
+      settings.setValue('content/hsplitter/sizes', self.hsplitter.sizes())
