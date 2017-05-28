@@ -63,6 +63,7 @@ class Core():
       self.cwd = settings.value('core/cwd', None)
       self.mw_size = settings.value('mainwindow/size', QtCore.QSize(1024, 768))
       self.mw_pos = settings.value('mainwindow/pos', QtCore.QPoint(0, 0))
+      self.mw_curstack = int(settings.value('mainwindow/curstack', 0))
 
 
    def savePreferences(self):
@@ -73,9 +74,9 @@ class Core():
       if not self.tempcwd:
          settings.setValue('core/cwd', self.cwd)
 
-      settings.setValue('mainwindow/size', self.mainwindow.size())
-      settings.setValue('mainwindow/pos', self.mainwindow.pos())
-      # TODO: save splitters pos
+      settings.setValue('mainwindow/size', self._mw.size())
+      settings.setValue('mainwindow/pos', self._mw.pos())
+      settings.setValue('mainwindow/curstack', self._mw.mainstack.currentIndex())
 
    def initnewproject(self, cwd = None):
       if cwd == None :
@@ -149,10 +150,12 @@ class MainWindow(QMainWindow):
       file.triggered[QAction].connect(self.onfilemenutrigger)
 
       # edit menu
-      edit = bar.addMenu("Edit")
-      edit.addAction("copy")
-      edit.addAction("paste")
-      edit.addAction("preferences")
+      edit = bar.addMenu("&Edit")
+      edit.addAction("&copy")
+      edit.addAction("&paste")
+      edit.addAction("&build")
+      edit.addAction("&reload")
+      edit.addAction("&preferences")
 
       # view menu
       view = bar.addMenu("&View")
@@ -170,6 +173,10 @@ class MainWindow(QMainWindow):
       view.addAction(versionview)
 
       view.triggered[QAction].connect(self.onviewmenutrigger)
+
+      # about menu
+      about = bar.addMenu("About")
+      about.addAction("&Website")
 
 
    def onfilemenutrigger(self, q):
@@ -236,36 +243,24 @@ class MainWindow(QMainWindow):
 
    def initMainStack(self):
       self.mainstack = QStackedWidget()
-      # self.tabwidget.setContentsMargins(0,0,0,0)
-      # self.tabwidget.setStyleSheet("""
-      #    QTabWidget::pane {
-      #       border:0px solid inherted;
-      #       margin:0px;
-      #       padding:0px;
-      #       }
-      #    QTabBar::tab {
-      #       padding: 4px;
-      #       font-size:12px;
-      #    }
-      #    QTabBar::tab:selected {
-      #       font-weight:bold;
-      #    }
-      #   """)
 
       self.designstack = design.DesignStack(self.core)
       self.contentstack = content.ContentStack(self.core)
       self.versionstack = QLabel("Version (git).")
 
-
       self.mainstack.addWidget(self.designstack)
       self.mainstack.addWidget(self.contentstack)
       self.mainstack.addWidget(self.versionstack)
+
+      self.mainstack.setCurrentIndex(self.core.mw_curstack)
 
       self.setCentralWidget(self.mainstack)
 
 
 def main():
    app = QApplication(sys.argv)
+   app.setOrganizationName('figli')
+   app.setApplicationName('Cascade')
    core = Core()
    mainappwindow = MainWindow(core)
    core.mainwindow = mainappwindow
