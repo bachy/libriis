@@ -12,17 +12,17 @@ from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 
 
 class WebkitView(QWebView):
-   def __init__(self, port):
+   def __init__(self, parent, port):
       self.port = port
-      self.view = QWebView.__init__(self)
+      self.view = QWebView.__init__(self, parent)
       self.load(QUrl('http://localhost:'+str(self.port)))
       self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
       # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
 
 
 class WebkitInspector(QWebInspector):
-   def __init__(self, webkitview):
-      super(WebkitInspector, self).__init__()
+   def __init__(self, parent, webkitview):
+      super(WebkitInspector, self).__init__(parent)
       self.webkitview = webkitview
       self.setPage(self.webkitview.page())
       # TODO: webkitinspector is disappearing when chaging tabs
@@ -61,7 +61,7 @@ class CodeEditor(QPlainTextEdit):
 
 
 class Editor(QWidget):
-   def __init__(self, core):
+   def __init__(self, parent, core):
       super(Editor, self).__init__()
       self.core = core
 
@@ -104,22 +104,26 @@ class DesignStack(QWidget):
       # webviewbox = QVBoxLayout()
       vsplitter = QSplitter(QtCore.Qt.Vertical)
 
-      self.webkitview = WebkitView(core.server.port)
+      self.webkitview = WebkitView(self, core.server.port)
       vsplitter.addWidget(self.webkitview)
 
-      self.webkitinspector = WebkitInspector(self.webkitview)
+      self.webkitinspector = WebkitInspector(self, self.webkitview)
       vsplitter.addWidget(self.webkitinspector)
+
+      shortcut = QShortcut(self)
+      shortcut.setKey("F12")
+      shortcut.activated.connect(self.toggleInspector)
+      self.webkitinspector.setVisible(False)
+
 
       hsplitter = QSplitter(QtCore.Qt.Horizontal)
       hsplitter.addWidget(vsplitter)
 
-      self.editor = Editor(core)
+      self.editor = Editor(self, core)
       hsplitter.addWidget(self.editor)
 
       hbox.addWidget(hsplitter)
 
-
-   # def onChanged(self, text):
-   #    print("ViewTba Layout Changed")
-   #    self.lbl.setText(text)
-   #    self.lbl.adjustSize()
+   def toggleInspector(self):
+      self.webkitinspector.setVisible(not self.webkitinspector.isVisible())
+      
