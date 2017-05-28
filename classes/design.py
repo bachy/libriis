@@ -4,7 +4,7 @@
 import sys, os, re
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, QSettings
 from PyQt5.QtGui import QKeySequence, QFont, QSyntaxHighlighter
 from PyQt5.QtWidgets import QWidget, QLabel, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut
 from PyQt5.QtWebKit import QWebSettings
@@ -26,6 +26,8 @@ class WebkitInspector(QWebInspector):
       self.webkitview = webkitview
       self.setPage(self.webkitview.page())
       # TODO: webkitinspector is disappearing when chaging tabs
+
+
 
 class CodeEditor(QPlainTextEdit):
    def __init__(self, core, tabs, file=None):
@@ -102,28 +104,55 @@ class DesignStack(QWidget):
 
 
       # webviewbox = QVBoxLayout()
-      vsplitter = QSplitter(QtCore.Qt.Vertical)
+      self.vsplitter = QSplitter(QtCore.Qt.Vertical)
 
       self.webkitview = WebkitView(self, core.server.port)
-      vsplitter.addWidget(self.webkitview)
+      self.vsplitter.addWidget(self.webkitview)
 
       self.webkitinspector = WebkitInspector(self, self.webkitview)
-      vsplitter.addWidget(self.webkitinspector)
+      self.vsplitter.addWidget(self.webkitinspector)
 
       shortcut = QShortcut(self)
       shortcut.setKey("F12")
       shortcut.activated.connect(self.toggleInspector)
       self.webkitinspector.setVisible(False)
 
+      self.vsplitter.splitterMoved.connect(self.movedSplitter)
 
-      hsplitter = QSplitter(QtCore.Qt.Horizontal)
-      hsplitter.addWidget(vsplitter)
+      self.hsplitter = QSplitter(QtCore.Qt.Horizontal)
+      self.hsplitter.addWidget(self.vsplitter)
 
       self.editor = Editor(self, core)
-      hsplitter.addWidget(self.editor)
+      self.hsplitter.addWidget(self.editor)
 
-      hbox.addWidget(hsplitter)
+      self.hsplitter.splitterMoved.connect(self.movedSplitter)
+
+      hbox.addWidget(self.hsplitter)
+
+      self.restorePrefs()
 
    def toggleInspector(self):
       self.webkitinspector.setVisible(not self.webkitinspector.isVisible())
-      
+
+
+   def restorePrefs(self):
+      settings = QSettings('FiguresLibres', 'Cascade')
+      print(settings.value('design/vsplitter/sizes', self.vsplitter.sizes()))
+      vals = settings.value('design/vsplitter/sizes', None)
+      if vals:
+         sizes = []
+         for size in vals: sizes.append(int(size))
+         self.vsplitter.setSizes(sizes)
+
+      vals = settings.value('design/hsplitter/sizes', None)
+      if vals:
+         sizes = []
+         for size in vals: sizes.append(int(size))
+         self.hsplitter.setSizes(sizes)
+
+
+   def movedSplitter(self):
+      settings = QSettings('FiguresLibres', 'Cascade')
+      print(self.vsplitter.sizes())
+      settings.setValue('design/vsplitter/sizes', self.vsplitter.sizes())
+      settings.setValue('design/hsplitter/sizes', self.hsplitter.sizes())
