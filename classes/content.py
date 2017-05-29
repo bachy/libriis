@@ -5,22 +5,26 @@ import sys, os
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
-from PyQt5.QtGui import QFont, QSyntaxHighlighter
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListWidget, QListWidgetItem, QAbstractItemView, QButtonGroup, QPushButton, QInputDialog
+from PyQt5.QtGui import QFont, QSyntaxHighlighter, QKeySequence
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListWidget, QListWidgetItem, QAbstractItemView, QButtonGroup, QPushButton, QInputDialog, QPlainTextEdit, QTextEdit,QShortcut
 
-import markdown
+import markdown2
 import re
 import json
 
-# from classes import orderablelist
 
-
+#    _____
+#   / ___/__  ______ ___  ____ ___  ____ ________  __
+#   \__ \/ / / / __ `__ \/ __ `__ \/ __ `/ ___/ / / /
+#  ___/ / /_/ / / / / / / / / / / / /_/ / /  / /_/ /
+# /____/\__,_/_/ /_/ /_/_/ /_/ /_/\__,_/_/   \__, /
+#                                           /____/
 class Summary(QWidget):
-   def __init__(self, core):
-      super(Summary, self).__init__()
-      self.core = core
+   def __init__(self, parent):
+      super(Summary, self).__init__(parent)
+      self.parent = parent
 
-      self.jsonfilepath = os.path.join(self.core.cwd,'.config/summary.json')
+      self.jsonfilepath = os.path.join(self.parent.core.cwd,'.config/summary.json')
       sum_json = open(self.jsonfilepath).read()
       self.sum = json.loads(sum_json)
 
@@ -30,7 +34,7 @@ class Summary(QWidget):
       self.list = SummaryList(self)
       vbox.addWidget(self.list)
 
-      self.actions = SummaryActions(self, core)
+      self.actions = SummaryActions(self)
       vbox.addWidget(self.actions)
 
       self.setLayout(vbox)
@@ -63,6 +67,7 @@ class Summary(QWidget):
          json.dump(newdata, fp, ensure_ascii=False, indent="\t")
 
 
+
 class SummaryList(QListWidget):
    def __init__(self, parent):
       super(SummaryList, self).__init__(parent)
@@ -77,41 +82,50 @@ class SummaryList(QListWidget):
       self.setDragDropMode(QAbstractItemView.InternalMove)
 
       self.model().rowsMoved.connect(self.onRowsMoved)
-      print(self.model())
+      # print(self.model())
 
-      for item in self.parent.sum:
-         self.addNewItem(item)
+      self.itemActivated.connect(self.onItemActivated)
+
+      # add markdown files to the list
+      for itemdata in self.parent.sum:
+         self.addNewItem(itemdata)
+
+      # self.setCurrentRow(0)
+      # self.setCurrentIndex()
+      # self.setCurrentItem()
+      self.item(0).setSelected(True)
+      # TODO: activate first item by default as it will open it with editor
+
+      # TODO: show activated item on the list
+      # TODO: show modifed item on the list
 
    def onRowsMoved(self, model, start, end, dest):
       # print("onRowsMoved")
       self.parent.recordNewList()
 
    def addNewItem(self, item):
-      # slw = SummaryListWidgetItem(self,item)
-      # lwi = QListWidgetItem(self)
-      # # Set size hint
-      # lwi.setSizeHint(slw.sizeHint())
-      # self.addItem(lwi)
-      # self.setItemWidget(lwi, slw)
-      # # self.addItem(QListWidgetItem())
       self.addItem(SummaryListWidgetItem(self,item))
 
+   def onItemActivated(self, item):
+      # print('onItemActivated', item.data)
+      self.parent.parent.editor.openFile()
+
+
 class SummaryListWidgetItem(QListWidgetItem):
-   def __init__(self,parent,item):
+   def __init__(self,parent,data):
       super(SummaryListWidgetItem, self).__init__(parent)
       self.parent = parent
-      self.item = item
+      self.data = data
 
-      self.setText(item['title'])
-      self.setToolTip(item['file'])
+      self.setText(data['title'])
+      self.setToolTip(data['file'])
 
 
 class SummaryActions(QWidget):
-   def __init__(self,parent,core):
+   def __init__(self,parent):
       super(SummaryActions, self).__init__(parent)
 
       self.parent = parent
-      self.core = core
 
       self.hbox = QHBoxLayout()
       self.hbox.setContentsMargins(0,0,0,0)
@@ -142,25 +156,105 @@ class SummaryActions(QWidget):
       # TODO: ask for confirmation for deleting the current selecred page
       # TODO: call for summary widget to delete the page
 
+#     ______    ___ __
+#    / ____/___/ (_) /_____  _____
+#   / __/ / __  / / __/ __ \/ ___/
+#  / /___/ /_/ / / /_/ /_/ / /
+# /_____/\__,_/_/\__/\____/_/
+class MarkdownEditor(QWidget):
+   def __init__(self,parent):
+      super(MarkdownEditor, self).__init__(parent)
+      self.parent = parent
+      self.changed = False
+
+      self.hbox = QHBoxLayout()
+      self.hbox.setContentsMargins(0,0,0,0)
+
+      self.styles = """
+         background-color:white;
+         color:black;
+         padding:20px;
+      """
+
+      self.editor = QPlainTextEdit(self)
+      self.editor.setStyleSheet(self.styles)
+      self.hbox.addWidget(self.editor)
+
+      self.viewer = QTextEdit(self)
+      self.viewer.setReadOnly(True)
+      self.viewer.setStyleSheet(self.styles)
+      # TODO: show all html blocks on viewer
+      self.hbox.addWidget(self.viewer)
+
+      self.setLayout(self.hbox)
+
+      self.editor.textChanged.connect(self.onTextChanged)
+      self.openFile()
+
+      self.shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
+      self.shortcut.activated.connect(self.save)
+
+      self.refreshViewer()
+
+   def openFile(self):
+      # print("openFile")
+      sumlist = self.parent.summary.list
+      currentitem = sumlist.currentItem()
+      if currentitem:
+         if not self.changed:
+            self.editor.textChanged.disconnect(self.onTextChanged)
+            filename = currentitem.data['file']
+            self.file = os.path.join(self.parent.core.cwd,'contents',filename)
+            self.editor.clear()
+            self.editor.insertPlainText(open(self.file, 'r').read())
+            self.refreshViewer()
+            self.editor.textChanged.connect(self.onTextChanged)
+         else:
+            print("Can't changed file, current id modified, please save first")
+            # TODO: ask for saving current file
+
+   def onTextChanged(self):
+      self.refreshViewer()
+      if not self.changed:
+         self.changed = True
+         # i = self.tabs.currentIndex()
+         # self.tabs.setTabText(i, "* "+self.tabs.tabText(i))
+
+   def refreshViewer(self):
+      markdown = self.editor.toPlainText()
+      html = markdown2.markdown(markdown)
+      self.viewer.setHtml(html)
+
+   def save(self):
+      if self.changed:
+         open(self.file, 'w').write(self.editor.toPlainText())
+         self.changed = False
+         # i = self.tabs.currentIndex()
+         # self.tabs.setTabText(i, re.sub(r'^\*\s', '', self.tabs.tabText(i)))
+         # TODO: how to combine file save and project save
+
+#     __  ___      _
+#    /  |/  /___ _(_)___
+#   / /|_/ / __ `/ / __ \
+#  / /  / / /_/ / / / / /
+# /_/  /_/\__,_/_/_/ /_/
 class ContentStack(QWidget):
    def __init__(self, core):
       super(ContentStack, self).__init__()
+      self.core = core
 
-      # self.grid = QGridLayout()
       hbox = QHBoxLayout()
       hbox.setContentsMargins(0,0,0,0)
       self.setLayout(hbox)
 
       self.hsplitter = QSplitter(QtCore.Qt.Horizontal)
 
-      self.summary = Summary(core)
+      self.summary = Summary(self)
+      # TODO: detect external changes (file changed or new file)
       self.hsplitter.addWidget(self.summary)
 
-      self.mdsource = QLabel("Content (markdown src).")
-      self.hsplitter.addWidget(self.mdsource)
-
-      self.mdpreview = QLabel("Content (markdown preview).")
-      self.hsplitter.addWidget(self.mdpreview)
+      self.editor = MarkdownEditor(self)
+      self.hsplitter.addWidget(self.editor)
 
       self.hsplitter.splitterMoved.connect(self.movedSplitter)
 
