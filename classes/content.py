@@ -54,9 +54,10 @@ class Summary(QWidget):
          json.dump(self.sum, fp, ensure_ascii=False, indent="\t")
       # refresh list
       self.list.addNewItem(item)
+      # reload content compiler
+      self.parent.core.contentcompiler.reload()
 
    def recordNewList(self):
-
       newdata = []
       for i in range(0,self.list.count()):
          # print(self.item(i).item['title'])
@@ -68,7 +69,8 @@ class Summary(QWidget):
       with open(jsonfilepath, "w") as fp:
          json.dump(newdata, fp, ensure_ascii=False, indent="\t")
 
-
+      # reload content compiler
+      self.parent.core.contentcompiler.reload()
 
 class SummaryList(QListWidget):
    def __init__(self, parent):
@@ -219,6 +221,7 @@ class MarkdownEditor(QWidget):
       self.refreshViewer()
       if not self.changed:
          self.changed = True
+         # TODO: show in list that content needs to be saved
          # i = self.tabs.currentIndex()
          # self.tabs.setTabText(i, "* "+self.tabs.tabText(i))
 

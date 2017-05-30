@@ -22,7 +22,7 @@ from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
 import json
 import git
 
-from classes import server, sasscompiler, design, content
+from classes import server, sasscompiler, design, content, md2html
 
 class Core():
    def __init__(self, parent=None):
@@ -44,6 +44,7 @@ class Core():
 
       self.server = server.Server(self)
       self.sasscompiler = sasscompiler.Compiler(self)
+      self.contentcompiler = md2html.Compiler(self)
 
    @property
    def mainwindow(self):
@@ -110,6 +111,7 @@ class Core():
       self.cwd = cwd
       self.server.reload()
       self.sasscompiler.reload()
+      self.contentcompiler.reload()
       # if not self.tempcwd:
       self._mw.setWindowTitle("Cascade – "+self.cwd)
 
