@@ -33,9 +33,12 @@ class Compiler():
    def refreshPaths(self):
       self.paths = [
          os.path.join(self.parent.cwd,'assets'),
-         os.path.join(self.parent.cwd,'assets/css'),
-         os.path.join(self.parent.cwd,'assets/css/styles.scss')
+         os.path.join(self.parent.cwd,'assets/css')
       ]
+      # os.path.join(self.parent.cwd,'assets/css/styles.scss')
+      for f in os.listdir(os.path.join(self.parent.cwd,'assets/css')):
+         if f.endswith("scss"):
+            self.paths.append(os.path.join(self.parent.cwd,'assets/css',f))
 
    def reload(self):
       self.fs_watcher.removePaths(self.paths)
