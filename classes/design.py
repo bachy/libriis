@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys, os, re
-
+import os, re
+# sys,
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, QSettings
-from PyQt5.QtGui import QKeySequence, QFont, QSyntaxHighlighter
-from PyQt5.QtWidgets import QWidget, QLabel, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox
+from PyQt5.QtGui import QKeySequence, QFont
+from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 
@@ -76,6 +76,7 @@ class WebViewOptions(QWidget):
 
    def onReload(self):
       print("onReload")
+      # self.parent.webkitview.
 
    def onPreview(self):
       print('onPreview')

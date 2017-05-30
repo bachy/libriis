@@ -3,9 +3,7 @@
 
 
 import sys, os
-
 from socket import socket
-
 import socketserver
 import http.server
 import threading

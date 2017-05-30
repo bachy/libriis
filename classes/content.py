@@ -1,15 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys, os
+import os, re
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
-from PyQt5.QtGui import QFont, QSyntaxHighlighter, QKeySequence
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListWidget, QListWidgetItem, QAbstractItemView, QButtonGroup, QPushButton, QInputDialog, QPlainTextEdit, QTextEdit,QShortcut
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListWidget, QListWidgetItem, QAbstractItemView, QPushButton, QInputDialog, QPlainTextEdit, QTextEdit, QShortcut
 
 import markdown2
-import re
 import json
 
 
