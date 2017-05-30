@@ -24,8 +24,8 @@ class Summary(QWidget):
       super(Summary, self).__init__(parent)
       self.parent = parent
 
-      self.jsonfilepath = os.path.join(self.parent.core.cwd,'.config/summary.json')
-      sum_json = open(self.jsonfilepath).read()
+      jsonfilepath = os.path.join(self.parent.core.cwd,'.config/summary.json')
+      sum_json = open(jsonfilepath).read()
       self.sum = json.loads(sum_json)
 
       vbox = QVBoxLayout()
@@ -43,13 +43,14 @@ class Summary(QWidget):
       # file
       filename = re.sub(r'\W', "_", text)+".md"
       # TODO: check if file does not already exists
-      filepath = os.path.join(self.core.cwd,'contents',filename)
+      filepath = os.path.join(self.parent.core.cwd,'contents',filename)
       with open(filepath, 'w') as fp:
          fp.write('#'+text)
       # json
       item = {"title":text,"file":filename}
       self.sum.append(item)
-      with open(self.jsonfilepath, "w") as fp:
+      jsonfilepath = os.path.join(self.parent.core.cwd,'.config/summary.json')
+      with open(jsonfilepath, "w") as fp:
          json.dump(self.sum, fp, ensure_ascii=False, indent="\t")
       # refresh list
       self.list.addNewItem(item)
@@ -59,11 +60,12 @@ class Summary(QWidget):
       newdata = []
       for i in range(0,self.list.count()):
          # print(self.item(i).item['title'])
-         newdata.append(self.list.item(i).item)
+         newdata.append(self.list.item(i).data)
 
       # print(newdata)
       self.sum = newdata
-      with open(self.jsonfilepath, "w") as fp:
+      jsonfilepath = os.path.join(self.parent.core.cwd,'.config/summary.json')
+      with open(jsonfilepath, "w") as fp:
          json.dump(newdata, fp, ensure_ascii=False, indent="\t")
 
 

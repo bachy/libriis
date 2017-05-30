@@ -22,11 +22,12 @@ from PyQt5.QtWebKitWidgets import QWebPage, QWebView, QWebInspector
 import json
 import git
 
-from classes import server, compiler, design, content
+from classes import server, sasscompiler, design, content
 
 class Core():
    def __init__(self, parent=None):
       # restore previous preferences
+      self.appcwd = os.getcwd()
 
       self.restorePreferences()
       self._mw = False
@@ -34,13 +35,15 @@ class Core():
       # print(self.temp)
 
       self.tempcwd = False
+      # if ther's not current project folder from restorepref
+      # initaite a new temp project
       if(self.cwd == None or not os.path.isdir(self.cwd)):
          self.cwd = os.path.join(self.temp, 'cwd')
          self.tempcwd = True
          self.initnewproject()
 
-      self.server = server.Server(self.temp)
-      self.compiler = compiler.Compiler(self.temp)
+      self.server = server.Server(self)
+      self.sasscompiler = sasscompiler.Compiler(self)
 
    @property
    def mainwindow(self):
@@ -61,6 +64,8 @@ class Core():
       # print(settings.allKeys())
 
       self.cwd = settings.value('core/cwd', None)
+      self.dialog_path = settings.value('core/dialog_path', os.path.expanduser('~'))
+
       self.mw_size = settings.value('mainwindow/size', QtCore.QSize(1024, 768))
       self.mw_pos = settings.value('mainwindow/pos', QtCore.QPoint(0, 0))
       self.mw_curstack = int(settings.value('mainwindow/curstack', 0))
@@ -74,6 +79,8 @@ class Core():
       if not self.tempcwd:
          settings.setValue('core/cwd', self.cwd)
 
+      settings.setValue('core/dialog_path', self.dialog_path)
+
       settings.setValue('mainwindow/size', self._mw.size())
       settings.setValue('mainwindow/pos', self._mw.pos())
       settings.setValue('mainwindow/curstack', self._mw.mainstack.currentIndex())
@@ -82,7 +89,7 @@ class Core():
       if cwd == None :
          cwd = self.cwd
       else :
-         self.cwd = cwd
+         self.changeCWD(cwd)
 
       shutil.copytree('templates/newproject', cwd)
       self.prefs = json.loads(open(os.path.join(cwd,'.config/prefs.json')).read())
@@ -94,11 +101,17 @@ class Core():
       # TODO: embed project styles.scss to app scss frame work
 
    def saveproject(self, cwd = None):
-      if not cwd == None and self.tempcwd:
+      if not cwd == None:
          shutil.copytree(self.cwd, cwd)
-         self.cwd = cwd
          self.tempcwd = False
-         self._mw.setWindowTitle("Cascade – "+self.cwd)
+         self.changeCWD(cwd)
+
+   def changeCWD(self, cwd):
+      self.cwd = cwd
+      self.server.reload()
+      self.sasscompiler.reload()
+      # if not self.tempcwd:
+      self._mw.setWindowTitle("Cascade – "+self.cwd)
 
    def quit(self):
       self.savePreferences()
@@ -113,7 +126,7 @@ class MainWindow(QMainWindow):
       self.core = core
 
       self.setWindowTitle("Cascade")
-      self.setWindowIcon(QIcon('assets/images/icon.png'))
+      self.setWindowIcon(QIcon(os.path.join(self.core.appcwd,'assets/images/icon.png')))
 
       self.resize(self.core.mw_size)
       self.move(self.core.mw_pos)
@@ -140,8 +153,6 @@ class MainWindow(QMainWindow):
       self.save_action = QAction("&Save Project as",self)
       self.save_action.setShortcut("Ctrl+Shift+s")
       file.addAction(self.save_action)
-      # if not self.core.tempcwd:
-      #    self.save_action.setEnabled(False)
 
       quit = QAction("&Quit",self)
       quit.setShortcut("Ctrl+q")
@@ -151,11 +162,18 @@ class MainWindow(QMainWindow):
 
       # edit menu
       edit = bar.addMenu("&Edit")
-      edit.addAction("&copy")
-      edit.addAction("&paste")
+      # edit.addAction("&copy")
+      # edit.addAction("&paste")
       edit.addAction("&build")
-      edit.addAction("&reload")
+
+      self.reload_action = QAction("&Reload",self)
+      self.reload_action.setShortcut("Ctrl+r")
+      edit.addAction(self.reload_action)
+
       edit.addAction("&preferences")
+
+      edit.triggered[QAction].connect(self.oneditmenutrigger)
+
 
       # view menu
       view = bar.addMenu("&View")
@@ -194,30 +212,49 @@ class MainWindow(QMainWindow):
       print("open")
 
    def newprojectdialogue(self):
-      projectname = QFileDialog.getSaveFileName(self, 'New Project', '')
+      dialog = QFileDialog()
+      dialog.setFileMode(QFileDialog.Directory)
+      dialog.setAcceptMode(QFileDialog.AcceptOpen)
+      projectname = dialog.getSaveFileName(
+         self,
+         'New Project',
+         self.core.dialog_path
+      )[0]
       # TODO: no file type
       try:
-         if not os.path.isdir(projectname[0]):
-            self.core.initnewproject(projectname[0])
+         head, tail = os.path.split(projectname)
+         self.core.dialog_path = head
+         if not os.path.isdir(projectname):
+            self.core.initnewproject(projectname)
          else:
             print("folder already exists")
             # TODO: check if is cascade folder
       except Exception as e:
+         print('Exception', e)
          pass
 
    def saveprojectdialogue(self, quit=False):
-      projectname = QFileDialog.getSaveFileName(self, 'Save Project', '')
+      dialog = QFileDialog()
+      dialog.setFileMode(QFileDialog.Directory)
+      dialog.setAcceptMode(QFileDialog.AcceptOpen)
+      projectname = dialog.getSaveFileName(
+         self,
+         'Save Project',
+         self.core.dialog_path
+      )[0]
       # TODO: no file type
       try:
-         if not os.path.isdir(projectname[0]):
-            self.core.saveproject(projectname[0])
-            # self.save_action.setEnabled(False)
+         head, tail = os.path.split(projectname)
+         self.core.dialog_path = head
+         if not os.path.isdir(projectname):
+            self.core.saveproject(projectname)
             if quit:
                self.quit()
          else:
             print("folder already exists")
             # TODO: check if is cascade folder
       except Exception as e:
+         print('Exception', e)
          pass
 
    def quit(self):
@@ -230,6 +267,13 @@ class MainWindow(QMainWindow):
             self.core.quit()
       else:
          self.core.quit()
+
+
+   def oneditmenutrigger(self, q):
+      print(q.text()+" is triggered")
+      if q.text() == "&Reload":
+         self.designstack.webkitview.reload()
+
 
    def onviewmenutrigger(self, q):
       print(q.text()+" is triggered")

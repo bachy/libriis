@@ -25,6 +25,7 @@ class WebkitInspector(QWebInspector):
       super(WebkitInspector, self).__init__(parent)
       self.webkitview = webkitview
       self.setPage(self.webkitview.page())
+      self.showMaximized()
       # TODO: webkitinspector is disappearing when chaging tabs
 
 
@@ -73,7 +74,7 @@ class Editor(QWidget):
       # Initialize tab screen
       self.tabs = QTabWidget()
 
-      self.scsstab = CodeEditor(core, self.tabs, 'assets/scss/styles.scss')
+      self.scsstab = CodeEditor(core, self.tabs, 'assets/css/styles.scss')
       self.jstab = CodeEditor(core, self.tabs, 'assets/js/script.js')
 
       # Add tabs
@@ -153,6 +154,6 @@ class DesignStack(QWidget):
 
    def movedSplitter(self):
       settings = QSettings('FiguresLibres', 'Cascade')
-      print(self.vsplitter.sizes())
+      # print(self.vsplitter.sizes())
       settings.setValue('design/vsplitter/sizes', self.vsplitter.sizes())
       settings.setValue('design/hsplitter/sizes', self.hsplitter.sizes())
