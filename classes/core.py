@@ -37,7 +37,12 @@ class Core():
          self.cwd = os.path.join(self.temp, 'cwd')
          self.tempcwd = True
          self.initnewproject()
+         self.initDeamons()
+      else:
+         self.initDeamons()
 
+
+   def initDeamons(self):
       self.server = server.Server(self)
       self.sasscompiler = sasscompiler.Compiler(self)
       self.contentcompiler = md2html.Compiler(self)
@@ -83,19 +88,18 @@ class Core():
       settings.setValue('mainwindow/curstack', self._mw.mainstack.currentIndex())
 
    def initnewproject(self, cwd = None):
+      print('initnewproject')
       if cwd == None :
          cwd = self.cwd
-      else :
-         self.changeCWD(cwd)
 
-      shutil.copytree('templates/newproject', cwd)
+      shutil.copytree(os.path.join(self.appcwd,'templates/newproject'), cwd)
       self.prefs = json.loads(open(os.path.join(cwd,'.config/prefs.json')).read())
       self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
       self.repository = git.Repo.init(cwd)
       self.repository.index.add(['assets','contents','.config'])
       self.repository.index.commit("initial commit")
-      # TODO: set mdtohtml compiler from project md to app index.html
-      # TODO: embed project styles.scss to app scss frame work
+
+      self.changeCWD(cwd)
 
    def saveproject(self, cwd = None):
       if not cwd == None:
@@ -103,13 +107,19 @@ class Core():
          self.tempcwd = False
          self.changeCWD(cwd)
 
+   def openproject(self, cwd=None):
+      if not cwd == None:
+         self.changeCWD(cwd)
+
    def changeCWD(self, cwd):
-      self.cwd = cwd
-      self.server.reload()
-      self.sasscompiler.reload()
-      self.contentcompiler.reload()
-      # if not self.tempcwd:
-      self._mw.setWindowTitle("Cascade – "+self.cwd)
+      if not cwd == self.cwd:
+         self.cwd = cwd
+         self._mw.setWindowTitle("Cascade – "+self.cwd)
+         self.server.reload()
+         self.sasscompiler.reload()
+         self.contentcompiler.reload()
+         self._mw.designstack.refresh()
+         self._mw.contentstack.refresh()
 
    def quit(self):
       self.savePreferences()

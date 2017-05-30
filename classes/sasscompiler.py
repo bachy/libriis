@@ -41,6 +41,9 @@ class Compiler():
             self.paths.append(os.path.join(self.parent.cwd,'assets/css',f))
 
    def reload(self):
+      # print('Reload sass compiler')
       self.fs_watcher.removePaths(self.paths)
       self.refreshPaths()
+      # print('paths', self.paths)
       self.fs_watcher.addPaths(self.paths)
+      # print('files', self.fs_watcher.files())

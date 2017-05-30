@@ -23,9 +23,7 @@ class Summary(QWidget):
       super(Summary, self).__init__(parent)
       self.parent = parent
 
-      jsonfilepath = os.path.join(self.parent.core.cwd,'.config/summary.json')
-      sum_json = open(jsonfilepath).read()
-      self.sum = json.loads(sum_json)
+      self.loadJson()
 
       vbox = QVBoxLayout()
       vbox.setContentsMargins(0,0,0,0)
@@ -37,6 +35,12 @@ class Summary(QWidget):
       vbox.addWidget(self.actions)
 
       self.setLayout(vbox)
+
+   def loadJson(self):
+      jsonfilepath = os.path.join(self.parent.core.cwd,'.config/summary.json')
+      sum_json = open(jsonfilepath).read()
+      self.sum = json.loads(sum_json)
+
 
    def addItem(self, text):
       # file
@@ -71,6 +75,10 @@ class Summary(QWidget):
       # reload content compiler
       self.parent.core.contentcompiler.reload()
 
+   def reload(self):
+      self.loadJson()
+      self.list.setItems()
+
 class SummaryList(QListWidget):
    def __init__(self, parent):
       super(SummaryList, self).__init__(parent)
@@ -89,9 +97,7 @@ class SummaryList(QListWidget):
 
       self.itemActivated.connect(self.onItemActivated)
 
-      # add markdown files to the list
-      for itemdata in self.parent.sum:
-         self.addNewItem(itemdata)
+      self.setItems()
 
       # self.setCurrentRow(0)
       # self.setCurrentIndex()
@@ -102,6 +108,12 @@ class SummaryList(QListWidget):
       # TODO: show activated item on the list
       # TODO: show modifed item on the list
 
+   def setItems(self):
+      self.clear()
+      # add markdown files to the list
+      for itemdata in self.parent.sum:
+         self.addNewItem(itemdata)
+
    def onRowsMoved(self, model, start, end, dest):
       # print("onRowsMoved")
       self.parent.recordNewList()
@@ -111,7 +123,7 @@ class SummaryList(QListWidget):
 
    def onItemActivated(self, item):
       # print('onItemActivated', item.data)
-      self.parent.parent.editor.openFile()
+      self.parent.parent.editor.openFile(self.currentRow())
 
 
 class SummaryListWidgetItem(QListWidgetItem):
@@ -199,14 +211,14 @@ class MarkdownEditor(QWidget):
 
       self.refreshViewer()
 
-   def openFile(self):
+   def openFile(self, row = 0):
       # print("openFile")
       sumlist = self.parent.summary.list
-      currentitem = sumlist.currentItem()
-      if currentitem:
+      item = sumlist.item(row)
+      if item:
          if not self.changed:
             self.editor.textChanged.disconnect(self.onTextChanged)
-            filename = currentitem.data['file']
+            filename = item.data['file']
             self.file = os.path.join(self.parent.core.cwd,'contents',filename)
             self.editor.clear()
             self.editor.insertPlainText(open(self.file, 'r').read())
@@ -258,6 +270,7 @@ class ContentStack(QWidget):
       self.hsplitter.addWidget(self.summary)
 
       self.editor = MarkdownEditor(self)
+
       self.hsplitter.addWidget(self.editor)
 
       self.hsplitter.splitterMoved.connect(self.movedSplitter)
@@ -279,3 +292,7 @@ class ContentStack(QWidget):
       settings = QSettings('FiguresLibres', 'Cascade')
       # print(self.hsplitter.sizes())
       settings.setValue('content/hsplitter/sizes', self.hsplitter.sizes())
+
+   def refresh(self):
+      self.summary.reload()
+      self.editor.openFile()

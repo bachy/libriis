@@ -95,20 +95,29 @@ class CodeEditor(QPlainTextEdit):
       super(CodeEditor, self).__init__()
       self.core = core
       self.tabs = tabs
-      # self.file = file
-      self.file = os.path.join(self.core.cwd,file)
-
-      self.insertPlainText(open(self.file, 'r').read())
-      self.changed = False
-      self.textChanged.connect(self.onTextChanged)
+      self.file = file
+      self.setText()
 
       self.shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
       self.shortcut.activated.connect(self.save)
 
+   def setText(self):
+      try:
+         self.textChanged.disconnect(self.onTextChanged)
+      except Exception as e:
+         print(e)
+
+      self.filepath = os.path.join(self.core.cwd,self.file)
+      self.clear()
+      self.insertPlainText(open(self.filepath, 'r').read())
+      self.changed = False
+      self.textChanged.connect(self.onTextChanged)
+
+
    def onTextChanged(self):
       # print('textChanged')
       # print(self.toPlainText())
-      # open(self.file, 'w').write(self.toPlainText())
+      # open(self.filepath, 'w').write(self.toPlainText())
       if not self.changed:
          self.changed = True
          i = self.tabs.currentIndex()
@@ -116,7 +125,7 @@ class CodeEditor(QPlainTextEdit):
 
    def save(self):
       if self.changed:
-         open(self.file, 'w').write(self.toPlainText())
+         open(self.filepath, 'w').write(self.toPlainText())
          i = self.tabs.currentIndex()
          self.tabs.setTabText(i, re.sub(r'^\*\s', '', self.tabs.tabText(i)))
          self.changed = False
@@ -153,6 +162,9 @@ class Editor(QWidget):
       # self.highlighter = Highlighter(self.document())
       # https://pypi.python.org/pypi/QScintilla/2.9.2
 
+   def refresh(self):
+      self.scsstab.setText()
+      self.jstab.setText()
 
 class DesignStack(QWidget):
    def __init__(self, core):
@@ -226,3 +238,7 @@ class DesignStack(QWidget):
       # print(self.vsplitter.sizes())
       settings.setValue('design/vsplitter/sizes', self.vsplitter.sizes())
       settings.setValue('design/hsplitter/sizes', self.hsplitter.sizes())
+
+   def refresh(self):
+      self.editor.refresh()
+      self.webkitview.reload()

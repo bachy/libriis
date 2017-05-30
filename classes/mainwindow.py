@@ -110,6 +110,28 @@ class MainWindow(QMainWindow):
 
    def openprojectdialogue(self):
       print("open")
+      dialog = QFileDialog()
+      dialog.setFileMode(QFileDialog.Directory)
+      dialog.setAcceptMode(QFileDialog.AcceptOpen)
+      options = QFileDialog.DontResolveSymlinks | QFileDialog.ShowDirsOnly
+      folder = dialog.getExistingDirectory(
+         self,
+         'Open Project',
+         self.core.dialog_path,
+         options
+      )
+      try:
+         head, tail = os.path.split(folder)
+         self.core.dialog_path = head
+         # TODO: check if is cascade folder
+         print(folder)
+         if os.path.isdir(folder):
+            self.core.openproject(folder)
+         else:
+            print("folder doesn't exists")
+      except Exception as e:
+         print('Exception', e)
+         pass
 
    def newprojectdialogue(self):
       dialog = QFileDialog()
