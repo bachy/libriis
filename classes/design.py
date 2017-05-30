@@ -6,7 +6,7 @@ import sys, os, re
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, QSettings
 from PyQt5.QtGui import QKeySequence, QFont, QSyntaxHighlighter
-from PyQt5.QtWidgets import QWidget, QLabel, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut
+from PyQt5.QtWidgets import QWidget, QLabel, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 
@@ -28,7 +28,66 @@ class WebkitInspector(QWebInspector):
       self.showMaximized()
       # TODO: webkitinspector is disappearing when chaging tabs
 
+class WebViewOptions(QWidget):
+   def __init__(self, parent):
+      super(WebViewOptions, self).__init__(parent)
+      self.parent = parent
+      self.hbox = QHBoxLayout()
+      self.hbox.setContentsMargins(0,0,0,0)
 
+      self.preview = QCheckBox('&Preview', self)
+      # self.preview.setShortcut('Ctrl+Shift+p')
+      self.preview.clicked.connect(self.onPreview)
+      self.hbox.addWidget(self.preview)
+
+      self.debug = QCheckBox('Deb&ug', self)
+      # self.debug.setShortcut('Ctrl+Shift+u')
+      self.debug.clicked.connect(self.onDebug)
+      self.hbox.addWidget(self.debug)
+
+      self.grid = QCheckBox('&Grid', self)
+      # self.grid.setShortcut('Ctrl+Shift+g')
+      self.grid.clicked.connect(self.onGrid)
+      self.hbox.addWidget(self.grid)
+
+      # spread
+      self.spread = QCheckBox('&Spread', self)
+      # self.spread.setShortcut('Ctrl+Shift+g')
+      self.spread.clicked.connect(self.onSpread)
+      self.hbox.addWidget(self.spread)
+
+      self.hbox.addStretch()
+
+      # zoom
+      # page
+
+      self.hbox.addStretch()
+
+
+
+      self.reload = QPushButton("&Reload", self)
+      # self.reload.setShortcut('Ctrl+Shift+r')
+      # TODO: how to define same shortcut in different places
+      # self.reload.setIcon(Icon(ico)))
+      self.reload.clicked.connect(self.onReload)
+      self.hbox.addWidget(self.reload)
+
+      self.setLayout(self.hbox)
+
+   def onReload(self):
+      print("onReload")
+
+   def onPreview(self):
+      print('onPreview')
+
+   def onDebug(self):
+      print('onDebug')
+
+   def onGrid(self):
+      print('onGrid')
+
+   def onSpread(self):
+      print('onSpread')
 
 class CodeEditor(QPlainTextEdit):
    def __init__(self, core, tabs, file=None):
@@ -99,36 +158,45 @@ class DesignStack(QWidget):
       super(DesignStack, self).__init__()
 
       # self.grid = QGridLayout()
-      hbox = QHBoxLayout()
-      hbox.setContentsMargins(0,0,0,0)
-      self.setLayout(hbox)
+      self.hbox = QHBoxLayout()
+      self.hbox.setContentsMargins(0,0,0,0)
+      self.setLayout(self.hbox)
 
 
-      # webviewbox = QVBoxLayout()
-      self.vsplitter = QSplitter(QtCore.Qt.Vertical)
+      self.webview = QWidget()
+      self.webview.vbox = QVBoxLayout()
+      self.webview.setLayout(self.webview.vbox)
+      self.webview.vbox.setContentsMargins(0,0,0,0)
+
 
       self.webkitview = WebkitView(self, core.server.port)
-      self.vsplitter.addWidget(self.webkitview)
 
       self.webkitinspector = WebkitInspector(self, self.webkitview)
-      self.vsplitter.addWidget(self.webkitinspector)
 
       shortcut = QShortcut(self)
       shortcut.setKey("F12")
       shortcut.activated.connect(self.toggleInspector)
       self.webkitinspector.setVisible(False)
 
+      self.webviewoptions = WebViewOptions(self)
+      self.webview.vbox.addWidget(self.webviewoptions)
+
+      self.vsplitter = QSplitter(QtCore.Qt.Vertical)
+      self.vsplitter.addWidget(self.webkitview)
+      self.vsplitter.addWidget(self.webkitinspector)
       self.vsplitter.splitterMoved.connect(self.movedSplitter)
 
+      self.webview.vbox.addWidget(self.vsplitter)
+
       self.hsplitter = QSplitter(QtCore.Qt.Horizontal)
-      self.hsplitter.addWidget(self.vsplitter)
+      self.hsplitter.addWidget(self.webview)
 
       self.editor = Editor(self, core)
       self.hsplitter.addWidget(self.editor)
 
       self.hsplitter.splitterMoved.connect(self.movedSplitter)
 
-      hbox.addWidget(self.hsplitter)
+      self.hbox.addWidget(self.hsplitter)
 
       self.restorePrefs()
 
