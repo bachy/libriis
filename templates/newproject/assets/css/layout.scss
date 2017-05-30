@@ -47,9 +47,9 @@
 // .body:after { bottom: $line-height * -3; }
 
 /*gauche*/
-.paper:nth-child(odd) .body:before { content: "Tous, des sang-mélés"; }
+.paper:nth-child(odd) .body:before { content: "Cascade, default header"; }
 /*droite*/
-.paper:nth-child(even) .body:before { content: "Tous, des sang-mélés"; }
+.paper:nth-child(even) .body:before { content: "Cascade, default header"; }
 
 .body:after  { content: counter(folio); z-index: 499;}
 

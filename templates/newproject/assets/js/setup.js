@@ -1,1 +1,1 @@
-nb_page = 100;
+nb_page = 2;
