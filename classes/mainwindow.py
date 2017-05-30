@@ -54,6 +54,10 @@ class MainWindow(QMainWindow):
       self.save_action.setShortcut("Ctrl+Shift+s")
       file.addAction(self.save_action)
 
+      prnt = QAction("&Print",self)
+      prnt.setShortcut("Ctrl+p")
+      file.addAction(prnt)
+
       quit = QAction("&Quit",self)
       quit.setShortcut("Ctrl+q")
       file.addAction(quit)
@@ -105,6 +109,8 @@ class MainWindow(QMainWindow):
          self.openprojectdialogue()
       elif q.text() == "&Save Project as":
          self.saveprojectdialogue()
+      elif q.text() == "&Print":
+         self.imprim()
       elif q.text() == "&Quit":
          self.quit()
 
@@ -178,6 +184,10 @@ class MainWindow(QMainWindow):
       except Exception as e:
          print('Exception', e)
          pass
+
+   def imprim(self):
+      print('imprim')
+      self.designstack.webkitview.onPrint()
 
    def quit(self):
       print("Quit")

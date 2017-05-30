@@ -9,6 +9,7 @@ from PyQt5.QtGui import QKeySequence, QFont
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
+from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
 
 
 class WebkitView(QWebView):
@@ -19,6 +20,19 @@ class WebkitView(QWebView):
       self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
       # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
 
+      self.printer = QPrinter()
+      self.printer.setPageSize(QPrinter.A4)
+      self.printer.setOrientation(QPrinter.Portrait)
+      self.printer.setPageMargins(10,10,10,10,QPrinter.Millimeter)
+      self.setFixedWidth(1000)
+
+
+   def onPrint(self):
+      dialog = QPrintPreviewDialog(self.printer)
+      # dialog.setWindowState(Qt.WindowMaximized)
+      dialog.paintRequested.connect(self.print_)
+      # dialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowContextHelpButtonHint)
+      dialog.exec()
 
 class WebkitInspector(QWebInspector):
    def __init__(self, parent, webkitview):
@@ -28,9 +42,9 @@ class WebkitInspector(QWebInspector):
       self.showMaximized()
       # TODO: webkitinspector is disappearing when chaging tabs
 
-class WebViewOptions(QWidget):
+class WebViewToolBar(QWidget):
    def __init__(self, parent):
-      super(WebViewOptions, self).__init__(parent)
+      super(WebViewToolBar, self).__init__(parent)
       self.parent = parent
       self.hbox = QHBoxLayout()
       self.hbox.setContentsMargins(0,0,0,0)
@@ -72,11 +86,14 @@ class WebViewOptions(QWidget):
       self.reload.clicked.connect(self.onReload)
       self.hbox.addWidget(self.reload)
 
-      self.setLayout(self.hbox)
+      self.imprim = QPushButton("&Print", self)
+      # self.imprim.setShortcut('Ctrl+Shift+r')
+      # TODO: how to define same shortcut in different places
+      # self.imprim.setIcon(Icon(ico)))
+      self.imprim.clicked.connect(self.onPrint)
+      self.hbox.addWidget(self.imprim)
 
-   def onReload(self):
-      print("onReload")
-      # self.parent.webkitview.
+      self.setLayout(self.hbox)
 
    def onPreview(self):
       print('onPreview')
@@ -89,6 +106,16 @@ class WebViewOptions(QWidget):
 
    def onSpread(self):
       print('onSpread')
+
+
+   def onReload(self):
+      print("onReload")
+      # self.parent.webkitview.
+
+   def onPrint(self):
+      print("onReload")
+      self.parent.webkitview.onPrint()
+
 
 class CodeEditor(QPlainTextEdit):
    def __init__(self, core, tabs, file=None):
@@ -181,7 +208,6 @@ class DesignStack(QWidget):
       self.webview.setLayout(self.webview.vbox)
       self.webview.vbox.setContentsMargins(0,0,0,0)
 
-
       self.webkitview = WebkitView(self, core.server.port)
 
       self.webkitinspector = WebkitInspector(self, self.webkitview)
@@ -191,8 +217,8 @@ class DesignStack(QWidget):
       shortcut.activated.connect(self.toggleInspector)
       self.webkitinspector.setVisible(False)
 
-      self.webviewoptions = WebViewOptions(self)
-      self.webview.vbox.addWidget(self.webviewoptions)
+      self.webviewtoolbar = WebViewToolBar(self)
+      self.webview.vbox.addWidget(self.webviewtoolbar)
 
       self.vsplitter = QSplitter(QtCore.Qt.Vertical)
       self.vsplitter.addWidget(self.webkitview)
