@@ -4,7 +4,7 @@
 import os, re
 # sys,
 from PyQt5 import QtCore
-from PyQt5.QtCore import QUrl, QSettings
+from PyQt5.QtCore import QUrl, QSettings, QSizeF
 from PyQt5.QtGui import QKeySequence, QFont
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox
 from PyQt5.QtWebKit import QWebSettings
@@ -13,26 +13,54 @@ from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
 
 
 class WebkitView(QWebView):
-   def __init__(self, parent, port):
-      self.port = port
+   def __init__(self, parent, core):
+      self.parent = parent
+      self.core = core
+      self.port = core.server.port
       self.view = QWebView.__init__(self, parent)
+      self.setZoomFactor(1)
       self.load(QUrl('http://localhost:'+str(self.port)))
       self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
       # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
 
-      self.printer = QPrinter()
-      self.printer.setPageSize(QPrinter.A4)
-      self.printer.setOrientation(QPrinter.Portrait)
-      self.printer.setPageMargins(10,10,10,10,QPrinter.Millimeter)
-      self.setFixedWidth(1000)
+      self.initPDF()
+      # self.mainframe = self.page.mainFrame()
+      # print(self.mainframe)
+
+   def initPDF(self):
+      self.printer = QPrinter(QPrinter.HighResolution)
+      self.printer.setFullPage(True)
+      # self.printer.setPageMargins(0,0,0,0,QPrinter.Millimeter)
+      self.printer.setFontEmbeddingEnabled(True)
+      self.printer.setColorMode(QPrinter.Color)
+      # TODO: set the page size and orientation from doc settings
+      # (need to do doc settings before that)
+      # self.printer.setPageSize(QPrinter.A4)
+      self.printer.setPaperSize(QSizeF(210, 300), QPrinter.Millimeter)
+      # self.printer.setOrientation(QPrinter.Portrait)
+      self.printer.setOutputFormat(QPrinter.PdfFormat)
+      self.printer.setCreator('Cascade')
+      self.printer.setDocName(self.core.projectname)
+      self.printer.setOutputFileName(self.core.projectname+".pdf")
+      # self.setFixedWidth(1000)
 
 
-   def onPrint(self):
-      dialog = QPrintPreviewDialog(self.printer)
+   def ongenPDF(self):
+      # QPrinter::Custom
+      # dialog = QPrintPreviewDialog(self.printer)
       # dialog.setWindowState(Qt.WindowMaximized)
-      dialog.paintRequested.connect(self.print_)
+      # dialog.paintRequested.connect(self.print_)
       # dialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowContextHelpButtonHint)
-      dialog.exec()
+      # dialog.exec()
+      # TODO: open a dialogue to ask where to save the pdf
+      # TODO: reload webview and wait for it before printing
+      # TODO: addd a progress bar
+      # self.webview.
+      self.print_(self.printer)
+
+   def refresh(self):
+      self.initPDF()
+      self.reload()
 
 class WebkitInspector(QWebInspector):
    def __init__(self, parent, webkitview):
@@ -149,6 +177,7 @@ class CodeEditor(QPlainTextEdit):
          self.changed = True
          i = self.tabs.currentIndex()
          self.tabs.setTabText(i, "* "+self.tabs.tabText(i))
+         # TODO: indicate that webview needs to be reloaded
 
    def save(self):
       if self.changed:
@@ -208,7 +237,7 @@ class DesignStack(QWidget):
       self.webview.setLayout(self.webview.vbox)
       self.webview.vbox.setContentsMargins(0,0,0,0)
 
-      self.webkitview = WebkitView(self, core.server.port)
+      self.webkitview = WebkitView(self, core)
 
       self.webkitinspector = WebkitInspector(self, self.webkitview)
 
@@ -267,4 +296,4 @@ class DesignStack(QWidget):
 
    def refresh(self):
       self.editor.refresh()
-      self.webkitview.reload()
+      self.webkitview.refresh()

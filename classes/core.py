@@ -40,6 +40,10 @@ class Core():
          self.initDeamons()
       else:
          self.initDeamons()
+         head, tail = os.path.split(self.cwd)
+         print('tail', tail)
+         self.projectname = tail
+
 
 
    def initDeamons(self):
@@ -114,10 +118,15 @@ class Core():
    def changeCWD(self, cwd):
       if not cwd == self.cwd:
          self.cwd = cwd
-         self._mw.setWindowTitle("Cascade – "+self.cwd)
          self.server.reload()
          self.sasscompiler.reload()
          self.contentcompiler.reload()
+
+      if not self.tempcwd:
+         self._mw.setWindowTitle("Cascade – "+self.cwd)
+         head, tail = os.path.split(self.cwd)
+         print('tail', projectname)
+         self.projectname = tail
          self._mw.designstack.refresh()
          self._mw.contentstack.refresh()
 

@@ -28,9 +28,9 @@
 /**
  * THE CODE BELOW IS REQUIRED TO MAKE HTML2PRINT WORK.
  */
-
 @function mm2pt($mm){
-  @return $mm*2.8346pt;
+  // @return $mm*2.8346pt;
+  @return $mm*1mm;
 }
 
 /**
@@ -41,8 +41,8 @@
  */
 
 /* the geometry of the page */
-$page-width: mm2pt(110);
-$page-height: mm2pt(200);
+$page-width: mm2pt(200);
+$page-height: mm2pt(287);
 
 /* the size of the crop marks based on scribus defaults */
 $crop-size: mm2pt(2);
