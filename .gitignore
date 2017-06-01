@@ -1,2 +1,4 @@
 assets/scss/*.css
 classes/__pycache__
+setup.py
+build

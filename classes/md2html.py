@@ -75,12 +75,14 @@ class Compiler():
          pdoc_filters = []
 
          output = pypandoc.convert_file(in_f,
-                                  to='html5',
-                                  format='markdown+header_attributes+link_attributes+bracketed_spans',
-                                  extra_args=pdoc_args,
-                                  filters=pdoc_filters)
+                               to='html5',
+                               format='markdown+header_attributes+link_attributes+bracketed_spans',
+                               extra_args=pdoc_args,
+                               filters=pdoc_filters)
 
          output_dom = BeautifulSoup(output, 'html.parser')
+
+         # TODO: hyphenate paragraph
 
          # append html story page to template_dom
          story_page = BeautifulSoup(
