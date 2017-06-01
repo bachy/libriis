@@ -12,7 +12,7 @@
 import os, shutil, tempfile
 # sys,
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSettings
+from PyQt5.QtCore import QSettings, QCoreApplication
 
 import json
 import git
@@ -44,6 +44,7 @@ class Core():
          print('tail', tail)
          self.projectname = tail
 
+      self.loadDocSettings()
 
 
    def initDeamons(self):
@@ -76,6 +77,17 @@ class Core():
       self.mw_pos = settings.value('mainwindow/pos', QtCore.QPoint(0, 0))
       self.mw_curstack = int(settings.value('mainwindow/curstack', 0))
 
+   def loadDocSettings(self):
+      self.docsettings = json.loads(open(os.path.join(self.cwd,'.config/prefs.json')).read())
+
+   def recordDocSettings(self,docsettings):
+      # print("doc settings",docsettings)
+      for key in docsettings:
+         self.docsettings[key] = docsettings[key]
+      jsonfilepath = os.path.join(self.cwd,'.config/prefs.json')
+      with open(jsonfilepath, "w") as fp:
+         json.dump(self.docsettings, fp, ensure_ascii=False, indent="\t")
+
 
    def savePreferences(self):
       # print("savePreferences")
@@ -97,13 +109,14 @@ class Core():
          cwd = self.cwd
 
       shutil.copytree(os.path.join(self.appcwd,'templates/newproject'), cwd)
-      self.prefs = json.loads(open(os.path.join(cwd,'.config/prefs.json')).read())
+      self.changeCWD(cwd)
+      self.loadDocSettings()
+      # self.docsettings = json.loads(open(os.path.join(cwd,'.config/prefs.json')).read())
       self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
       self.repository = git.Repo.init(cwd)
       self.repository.index.add(['assets','contents','.config'])
       self.repository.index.commit("initial commit")
 
-      self.changeCWD(cwd)
 
    def saveproject(self, cwd = None):
       if not cwd == None:

@@ -108,7 +108,6 @@ class MainWindow(QMainWindow):
       about = bar.addMenu("About")
       about.addAction("&Website")
 
-
    def onfilemenutrigger(self, q):
       print(q.text()+" is triggered")
       if q.text() == "&New Project":
@@ -196,10 +195,18 @@ class MainWindow(QMainWindow):
          pass
 
    def onDocSettings(self):
-      dialog = docsetdialog.DocsetDialog(self)
-      value = dialog.exec_()
-      if value:
-         print(value)
+      d = docsetdialog.DocsetDialog(self)
+      d.exec_()
+      self.core.recordDocSettings({
+         "pw":d.pw.text(),
+         "ph":d.ph.text(),
+         "mt":d.mt.text(),
+         "mb":d.mb.text(),
+         "me":d.me.text(),
+         "mi":d.mi.text(),
+         "cs":d.cs.text(),
+         "bs":d.bs.text()
+      })
 
    def genPDF(self):
       print('PDF')

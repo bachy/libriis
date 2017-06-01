@@ -10,14 +10,14 @@
 # @License: GPL-V3
 
 import os
-# from PyQt5.QtCore import
+# from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QIcon, QIntValidator
-from PyQt5.QtWidgets import QWidget, QLabel, QDialog, QGroupBox, QDialogButtonBox, QVBoxLayout, QFormLayout, QLineEdit, QComboBox, QSpinBox
+from PyQt5.QtWidgets import QWidget, QLabel, QDialog, QGroupBox, QDialogButtonBox, QVBoxLayout, QFormLayout, QLineEdit, QComboBox, QSpinBox, QFrame
 
 class DocsetDialog(QDialog):
    def __init__(self, parent):
       super(DocsetDialog, self).__init__(parent)
-
+      self.parent = parent
       self.createFormGroupBox()
 
       buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -32,44 +32,64 @@ class DocsetDialog(QDialog):
       self.setWindowTitle("Doc settings")
 
    def createFormGroupBox(self):
+      ds = self.parent.core.docsettings
+
       self.formGroupBox = QGroupBox("Form layout")
       layout = QFormLayout()
 
-      pw = QLineEdit(str(210))
-      pw.setValidator(QIntValidator())
-      pw.setMaxLength(5)
-      layout.addRow(QLabel("Page Width (mm):"), pw)
-
-      ph = QLineEdit(str(297))
-      ph.setValidator(QIntValidator())
-      ph.setMaxLength(5)
-      layout.addRow(QLabel("Page Height (mm):"), ph)
+      layout.addRow(QLabel("Page"))
+      self.pw = QLineEdit(str(ds['pw']))
+      self.pw.setFixedWidth(60)
+      self.pw.setValidator(QIntValidator())
+      self.pw.setMaxLength(5)
+      layout.addRow(QLabel("Page Width (mm):"), self.pw)
+      self.ph = QLineEdit(str(ds['ph']))
+      self.ph.setFixedWidth(60)
+      self.ph.setValidator(QIntValidator())
+      self.ph.setMaxLength(5)
+      layout.addRow(QLabel("Page Height (mm):"), self.ph)
       #
-      mt = QLineEdit(str(15))
-      mt.setValidator(QIntValidator())
-      mt.setMaxLength(3)
-      layout.addRow(QLabel("Margin Top (mm):"), mt)
-      mb = QLineEdit(str(15))
-      mb.setValidator(QIntValidator())
-      mb.setMaxLength(3)
-      layout.addRow(QLabel("Margin Bottom (mm):"), mb)
-      mi = QLineEdit(str(15))
-      mi.setValidator(QIntValidator())
-      mi.setMaxLength(3)
-      layout.addRow(QLabel("Margin inner (mm):"), mi)
-      me = QLineEdit(str(10))
-      me.setValidator(QIntValidator())
-      me.setMaxLength(3)
-      layout.addRow(QLabel("Margin external (mm):"), me)
+      line1 = QFrame()
+      line1.setFrameShape(QFrame.HLine)
+      line1.setFrameShadow(QFrame.Sunken)
+      layout.addRow(line1)
       #
-      cs = QLineEdit(str(5))
-      cs.setValidator(QIntValidator())
-      cs.setMaxLength(3)
-      layout.addRow(QLabel("Crop size (mm):"), cs)
-      bs = QLineEdit(str(5))
-      bs.setValidator(QIntValidator())
-      bs.setMaxLength(3)
-      layout.addRow(QLabel("Bleed size (mm):"), bs)
+      self.mt = QLineEdit(str(ds['mt']))
+      self.mt.setFixedWidth(60)
+      self.mt.setValidator(QIntValidator())
+      self.mt.setMaxLength(3)
+      layout.addRow(QLabel("Margin Top (mm):"), self.mt)
+      self.mb = QLineEdit(str(ds['mb']))
+      self.mb.setFixedWidth(60)
+      self.mb.setValidator(QIntValidator())
+      self.mb.setMaxLength(3)
+      layout.addRow(QLabel("Margin Bottom (mm):"), self.mb)
+      self.mi = QLineEdit(str(ds['mi']))
+      self.mi.setFixedWidth(60)
+      self.mi.setValidator(QIntValidator())
+      self.mi.setMaxLength(3)
+      layout.addRow(QLabel("Margin inner (mm):"), self.mi)
+      self.me = QLineEdit(str(ds['me']))
+      self.me.setFixedWidth(60)
+      self.me.setValidator(QIntValidator())
+      self.me.setMaxLength(3)
+      layout.addRow(QLabel("Margin external (mm):"), self.me)
+      #
+      line2 = QFrame()
+      line2.setFrameShape(QFrame.HLine)
+      line2.setFrameShadow(QFrame.Sunken)
+      layout.addRow(line2)
+      #
+      self.cs = QLineEdit(str(ds['cs']))
+      self.cs.setFixedWidth(60)
+      self.cs.setValidator(QIntValidator())
+      self.cs.setMaxLength(3)
+      layout.addRow(QLabel("Crop size (mm):"), self.cs)
+      self.bs = QLineEdit(str(ds['bs']))
+      self.bs.setFixedWidth(60)
+      self.bs.setValidator(QIntValidator())
+      self.bs.setMaxLength(3)
+      layout.addRow(QLabel("Bleed size (mm):"), self.bs)
       # # layout.addRow(QLabel("Country:"), QComboBox())
       # layout.addRow(QLabel("Age:"), QSpinBox())
 
