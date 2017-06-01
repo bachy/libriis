@@ -6,7 +6,7 @@ import os, re
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, QSettings, QSizeF
 from PyQt5.QtGui import QKeySequence, QFont
-from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox
+from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox, QSpinBox, QLabel
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
@@ -74,6 +74,14 @@ class WebViewToolBar(QWidget):
    def __init__(self, parent):
       super(WebViewToolBar, self).__init__(parent)
       self.parent = parent
+
+      font = QFont()
+      # font.setFamily("Droid Sans Mono")
+      # font.setFixedPitch(True)
+      font.setPointSize(8)
+      self.setFont(font)
+
+
       self.hbox = QHBoxLayout()
       self.hbox.setContentsMargins(0,0,0,0)
 
@@ -101,7 +109,23 @@ class WebViewToolBar(QWidget):
       self.hbox.addStretch()
 
       # zoom
+      self.hbox.addWidget(QLabel("Zoom:"))
+      self.zoom = QSpinBox(self)
+      # TODO: action
+      self.hbox.addWidget(self.zoom)
+
       # page
+      self.hbox.addWidget(QLabel("Page:"))
+      self.page = QSpinBox(self)
+      # TODO: action
+      self.hbox.addWidget(self.page)
+
+      self.addpage = QPushButton("&Add Page", self)
+      # self.addpage.setShortcut('Ctrl+Shift+r')
+      # TODO: how to define same shortcut in different places
+      # self.addpage.setIcon(Icon(ico)))
+      # self.addpage.clicked.connect(self.onAddPage)
+      self.hbox.addWidget(self.addpage)
 
       self.hbox.addStretch()
 
@@ -114,12 +138,12 @@ class WebViewToolBar(QWidget):
       self.reload.clicked.connect(self.onReload)
       self.hbox.addWidget(self.reload)
 
-      self.imprim = QPushButton("&Print", self)
-      # self.imprim.setShortcut('Ctrl+Shift+r')
+      self.genpdf = QPushButton("&PDF", self)
+      # self.genpdf.setShortcut('Ctrl+Shift+r')
       # TODO: how to define same shortcut in different places
-      # self.imprim.setIcon(Icon(ico)))
-      self.imprim.clicked.connect(self.onPrint)
-      self.hbox.addWidget(self.imprim)
+      # self.genpdf.setIcon(Icon(ico)))
+      self.genpdf.clicked.connect(self.onGenPDF)
+      self.hbox.addWidget(self.genpdf)
 
       self.setLayout(self.hbox)
 
@@ -140,9 +164,9 @@ class WebViewToolBar(QWidget):
       print("onReload")
       # self.parent.webkitview.
 
-   def onPrint(self):
-      print("onReload")
-      self.parent.webkitview.onPrint()
+   def onGenPDF(self):
+      print("onGenPDF")
+      self.parent.webkitview.ongenPDF()
 
 
 class CodeEditor(QPlainTextEdit):
@@ -167,6 +191,16 @@ class CodeEditor(QPlainTextEdit):
       self.insertPlainText(open(self.filepath, 'r').read())
       self.changed = False
       self.textChanged.connect(self.onTextChanged)
+
+
+      font = QFont()
+      font.setFamily("Droid Sans Mono")
+      font.setFixedPitch(True)
+      font.setPointSize(12)
+      self.setFont(font)
+      # self.highlighter = Highlighter(self.document())
+      # https://pypi.python.org/pypi/QScintilla/2.9.2
+
 
 
    def onTextChanged(self):
@@ -209,14 +243,6 @@ class Editor(QWidget):
       # Add tabs to widget
       self.layout.addWidget(self.tabs)
       self.setLayout(self.layout)
-
-      # font = QFont()
-      # font.setFamily('Courier')
-      # font.setFixedPitch(True)
-      # font.setPointSize(10)
-      # self.setFont(font)
-      # self.highlighter = Highlighter(self.document())
-      # https://pypi.python.org/pypi/QScintilla/2.9.2
 
    def refresh(self):
       self.scsstab.setText()

@@ -14,7 +14,7 @@ import os
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QLabel, QStackedWidget, QFileDialog, QMessageBox
 
-from classes import design, content
+from classes import design, content, docsetdialog
 
 
 
@@ -54,13 +54,21 @@ class MainWindow(QMainWindow):
       self.save_action.setShortcut("Ctrl+Shift+s")
       file.addAction(self.save_action)
 
-      prnt = QAction("&PDF",self)
-      prnt.setShortcut("Ctrl+p")
-      file.addAction(prnt)
+      self.save_action = QAction("&Save Project as",self)
+      self.save_action.setShortcut("Ctrl+Shift+s")
+      file.addAction(self.save_action)
 
-      quit = QAction("&Quit",self)
-      quit.setShortcut("Ctrl+q")
-      file.addAction(quit)
+      self.docset_action = QAction("&Document Settings",self)
+      self.docset_action.setShortcut("Ctrl+d")
+      file.addAction(self.docset_action)
+
+      self.pdf_action = QAction("&PDF",self)
+      self.pdf_action.setShortcut("Ctrl+p")
+      file.addAction(self.pdf_action)
+
+      self.quit_action = QAction("&Quit",self)
+      self.quit_action.setShortcut("Ctrl+q")
+      file.addAction(self.quit_action)
 
       file.triggered[QAction].connect(self.onfilemenutrigger)
 
@@ -109,6 +117,8 @@ class MainWindow(QMainWindow):
          self.openprojectdialogue()
       elif q.text() == "&Save Project as":
          self.saveprojectdialogue()
+      elif q.text() == "&Document Settings":
+         self.onDocSettings()
       elif q.text() == "&PDF":
          self.genPDF()
       elif q.text() == "&Quit":
@@ -184,6 +194,12 @@ class MainWindow(QMainWindow):
       except Exception as e:
          print('Exception', e)
          pass
+
+   def onDocSettings(self):
+      dialog = docsetdialog.DocsetDialog(self)
+      value = dialog.exec_()
+      if value:
+         print(value)
 
    def genPDF(self):
       print('PDF')
