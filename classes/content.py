@@ -8,6 +8,8 @@ from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListWidget, QListWidgetItem, QAbstractItemView, QPushButton, QInputDialog, QPlainTextEdit, QTextEdit, QShortcut
 
+from classes import highlighter
+
 import markdown2
 import json
 
@@ -193,6 +195,8 @@ class MarkdownEditor(QWidget):
 
       self.editor = QPlainTextEdit(self)
       self.editor.setStyleSheet(self.styles)
+
+      self.hl=highlighter.Highlighter(self.editor.document(),"md")
       self.hbox.addWidget(self.editor)
 
       self.viewer = QTextEdit(self)

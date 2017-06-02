@@ -11,6 +11,11 @@ from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
 
+# from pygments import highlight
+# from pygments.lexers import *
+# from pygments.formatter import Formatter
+from classes import highlighter
+
 
 class WebkitView(QWebView):
    def __init__(self, parent, core):
@@ -170,12 +175,14 @@ class WebViewToolBar(QWidget):
 
 
 class CodeEditor(QPlainTextEdit):
-   def __init__(self, core, tabs, file=None):
+   def __init__(self, core, tabs, file, mode):
       super(CodeEditor, self).__init__()
       self.core = core
       self.tabs = tabs
       self.file = file
       self.setText()
+      self.setTabStopWidth(15)
+      self.hl= highlighter.Highlighter(self.document(),mode)
 
       self.shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
       self.shortcut.activated.connect(self.save)
@@ -233,8 +240,8 @@ class Editor(QWidget):
       # Initialize tab screen
       self.tabs = QTabWidget()
 
-      self.scsstab = CodeEditor(core, self.tabs, 'assets/css/styles.scss')
-      self.jstab = CodeEditor(core, self.tabs, 'assets/js/script.js')
+      self.scsstab = CodeEditor(core, self.tabs, 'assets/css/styles.scss', "scss")
+      self.jstab = CodeEditor(core, self.tabs, 'assets/js/script.js', 'js')
 
       # Add tabs
       self.tabs.addTab(self.scsstab,"scss")
