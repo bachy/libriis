@@ -34,63 +34,64 @@ class DocsetDialog(QDialog):
    def createFormGroupBox(self):
       ds = self.parent.core.docsettings
 
-      self.formGroupBox = QGroupBox("Form layout")
+      self.formGroupBox = QGroupBox()
       layout = QFormLayout()
 
-      layout.addRow(QLabel("Page"))
-      self.pw = QLineEdit(str(ds['pw']))
-      self.pw.setFixedWidth(60)
-      self.pw.setValidator(QIntValidator())
-      self.pw.setMaxLength(5)
+      self.pw = FormLineEdit(str(ds['pw']))
       layout.addRow(QLabel("Page Width (mm):"), self.pw)
-      self.ph = QLineEdit(str(ds['ph']))
-      self.ph.setFixedWidth(60)
-      self.ph.setValidator(QIntValidator())
-      self.ph.setMaxLength(5)
+      self.ph = FormLineEdit(str(ds['ph']))
       layout.addRow(QLabel("Page Height (mm):"), self.ph)
       #
-      line1 = QFrame()
-      line1.setFrameShape(QFrame.HLine)
-      line1.setFrameShadow(QFrame.Sunken)
-      layout.addRow(line1)
+      layout.addRow(Line(self))
       #
-      self.mt = QLineEdit(str(ds['mt']))
-      self.mt.setFixedWidth(60)
-      self.mt.setValidator(QIntValidator())
-      self.mt.setMaxLength(3)
+      self.mt = FormLineEdit(str(ds['mt']),3)
       layout.addRow(QLabel("Margin Top (mm):"), self.mt)
-      self.mb = QLineEdit(str(ds['mb']))
-      self.mb.setFixedWidth(60)
-      self.mb.setValidator(QIntValidator())
-      self.mb.setMaxLength(3)
+      self.mb = FormLineEdit(str(ds['mb']),3)
       layout.addRow(QLabel("Margin Bottom (mm):"), self.mb)
-      self.mi = QLineEdit(str(ds['mi']))
-      self.mi.setFixedWidth(60)
-      self.mi.setValidator(QIntValidator())
-      self.mi.setMaxLength(3)
+      self.mi = FormLineEdit(str(ds['mi']),3)
       layout.addRow(QLabel("Margin inner (mm):"), self.mi)
-      self.me = QLineEdit(str(ds['me']))
-      self.me.setFixedWidth(60)
-      self.me.setValidator(QIntValidator())
-      self.me.setMaxLength(3)
+      self.me = FormLineEdit(str(ds['me']),3)
       layout.addRow(QLabel("Margin external (mm):"), self.me)
       #
-      line2 = QFrame()
-      line2.setFrameShape(QFrame.HLine)
-      line2.setFrameShadow(QFrame.Sunken)
-      layout.addRow(line2)
+      layout.addRow(Line(self))
       #
-      self.cs = QLineEdit(str(ds['cs']))
-      self.cs.setFixedWidth(60)
-      self.cs.setValidator(QIntValidator())
-      self.cs.setMaxLength(3)
+      self.cs = FormLineEdit(str(ds['cs']),3)
       layout.addRow(QLabel("Crop size (mm):"), self.cs)
-      self.bs = QLineEdit(str(ds['bs']))
-      self.bs.setFixedWidth(60)
-      self.bs.setValidator(QIntValidator())
-      self.bs.setMaxLength(3)
+      self.bs = FormLineEdit(str(ds['bs']),3)
       layout.addRow(QLabel("Bleed size (mm):"), self.bs)
-      # # layout.addRow(QLabel("Country:"), QComboBox())
-      # layout.addRow(QLabel("Age:"), QSpinBox())
+      #
+      layout.addRow(Line(self))
+      #
+      self.cn = FormLineEdit(str(ds['cn']),2,True)
+      layout.addRow(QLabel("Columns number:"), self.cn)
+      self.cg = FormLineEdit(str(ds['cg']),2)
+      layout.addRow(QLabel("Columns gutters:"), self.cg)
+      #
+      self.rn = FormLineEdit(str(ds['rn']),2,True)
+      layout.addRow(QLabel("Rows number:"), self.rn)
+      self.rg = FormLineEdit(str(ds['rg']),2)
+      layout.addRow(QLabel("Rows gutters:"), self.rg)
+      #
+      layout.addRow(Line(self))
+      #
+      self.lh = FormLineEdit(str(ds['lh']),2,True)
+      layout.addRow(QLabel("Line height:"), self.lh)
 
       self.formGroupBox.setLayout(layout)
+
+class FormLineEdit(QLineEdit):
+   def __init__(self, parent, ml=5, int=False, mw=60):
+      super(FormLineEdit, self).__init__(parent)
+      self.setFixedWidth(mw)
+      self.setMaxLength(ml)
+      if int:
+         self.setValidator(QIntValidator())
+      else:
+         # TODO: set float validator
+         self.setValidator(QIntValidator())
+
+class Line(QFrame):
+   def __init__(self, parent):
+      super(Line, self).__init__(parent)
+      self.setFrameShape(QFrame.HLine)
+      self.setFrameShadow(QFrame.Sunken)

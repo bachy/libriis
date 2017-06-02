@@ -205,7 +205,12 @@ class MainWindow(QMainWindow):
          "me":d.me.text(),
          "mi":d.mi.text(),
          "cs":d.cs.text(),
-         "bs":d.bs.text()
+         "bs":d.bs.text(),
+         "cn":d.cn.text(),
+         "cg":d.cg.text(),
+         "rn":d.rn.text(),
+         "rg":d.rg.text(),
+         "lh":d.lh.text()
       })
 
    def genPDF(self):

@@ -9,7 +9,7 @@
 # @Last modified time: 21-04-2017
 # @License: GPL-V3
 
-import os, shutil, tempfile
+import os, re, shutil, tempfile
 # sys,
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings, QCoreApplication
@@ -77,18 +77,6 @@ class Core():
       self.mw_pos = settings.value('mainwindow/pos', QtCore.QPoint(0, 0))
       self.mw_curstack = int(settings.value('mainwindow/curstack', 0))
 
-   def loadDocSettings(self):
-      self.docsettings = json.loads(open(os.path.join(self.cwd,'.config/prefs.json')).read())
-
-   def recordDocSettings(self,docsettings):
-      # print("doc settings",docsettings)
-      for key in docsettings:
-         self.docsettings[key] = docsettings[key]
-      jsonfilepath = os.path.join(self.cwd,'.config/prefs.json')
-      with open(jsonfilepath, "w") as fp:
-         json.dump(self.docsettings, fp, ensure_ascii=False, indent="\t")
-
-
    def savePreferences(self):
       # print("savePreferences")
       settings = QSettings('FiguresLibres', 'Cascade')
@@ -103,6 +91,102 @@ class Core():
       settings.setValue('mainwindow/pos', self._mw.pos())
       settings.setValue('mainwindow/curstack', self._mw.mainstack.currentIndex())
 
+   def loadDocSettings(self):
+      self.docsettings = json.loads(open(os.path.join(self.cwd,'.config/docsettings.json')).read())
+
+   def recordDocSettings(self,docsettings):
+      # print("doc settings",docsettings)
+      for key in docsettings:
+         self.docsettings[key] = docsettings[key]
+      jsonfilepath = os.path.join(self.cwd,'.config/docsettings.json')
+      with open(jsonfilepath, "w") as fp:
+         json.dump(self.docsettings, fp, ensure_ascii=False, indent="\t")
+
+      self.updateScss()
+
+   def updateScss(self):
+      # print(self.docsettings)
+      sassfilepath = os.path.join(self.cwd,'assets/css/main.scss')
+      # print(sassfilepath)
+      sass = open(sassfilepath,"r").read()
+      
+      # $page-width: mm2pt(180);
+      sass = re.sub(
+         r'\$page-width:\smm2pt\([0-9|\.]+\);',
+         '$page-width: mm2pt('+self.docsettings['pw']+');',
+         sass)
+      # $page-height: mm2pt(287);
+      sass = re.sub(
+         r'\$page-height:\smm2pt\([0-9|\.]+\);',
+         '$page-height: mm2pt('+self.docsettings['ph']+');',
+         sass)
+
+      # $page-margin-outside: mm2pt(15);
+      sass = re.sub(
+         r'\$page-margin-outside:\smm2pt\([0-9|\.]+\);',
+         '$page-margin-outside: mm2pt('+self.docsettings['me']+');',
+         sass)
+      # $page-margin-inside: mm2pt(7.5);
+      sass = re.sub(
+         r'\$page-margin-inside:\smm2pt\([0-9|\.]+\);',
+         '$page-margin-inside: mm2pt('+self.docsettings['mi']+');',
+         sass)
+      # $page-margin-top: mm2pt(10);
+      sass = re.sub(
+         r'\$page-margin-top:\smm2pt\([0-9|\.]+\);',
+         '$page-margin-top: mm2pt('+self.docsettings['mt']+');',
+         sass)
+      # $page-margin-bottom: mm2pt(10);
+      sass = re.sub(
+         r'\$page-margin-bottom:\smm2pt\([0-9|\.]+\);',
+         '$page-margin-bottom: mm2pt('+self.docsettings['mb']+');',
+         sass)
+
+      # $crop-size: mm2pt(2);
+      sass = re.sub(
+         r'\$crop-size:\smm2pt\([0-9|\.]+\);',
+         '$crop-size: mm2pt('+self.docsettings['cs']+');',
+         sass)
+      # $bleed: mm2pt(3);
+      sass = re.sub(
+         r'\$bleed:\smm2pt\([0-9|\.]+\);',
+         '$bleed: mm2pt('+self.docsettings['bs']+');',
+         sass)
+
+      # $col-number: 9;
+      sass = re.sub(
+         r'\$col-number:\smm2pt\([0-9|\.]+\);',
+         '$col-number: mm2pt('+self.docsettings['cn']+');',
+         sass)
+      # $col-gutter: mm2pt(3);
+      sass = re.sub(
+         r'\$col-butter:\smm2pt\([0-9|\.]+\);',
+         '$col-butter: mm2pt('+self.docsettings['cg']+');',
+         sass)
+      #
+      # $row-number: 12;
+      sass = re.sub(
+         r'\$row-number:\smm2pt\([0-9|\.]+\);',
+         '$row-number: mm2pt('+self.docsettings['rn']+');',
+         sass)
+      # $row-gutter: mm2pt(4);
+      sass = re.sub(
+         r'\$row-butter:\smm2pt\([0-9|\.]+\);',
+         '$row-butter: mm2pt('+self.docsettings['rg']+');',
+         sass)
+      #
+      # $line-height: mm2pt(4);
+      sass = re.sub(
+         r'\$line-height:\smm2pt\([0-9|\.]+\);',
+         '$line-height: mm2pt('+self.docsettings['lh']+');',
+         sass)
+
+      # print('sass', sass)
+      open(sassfilepath,"w").write(sass)
+
+      self._mw.designstack.webkitview.reload()
+
+
    def initnewproject(self, cwd = None):
       print('initnewproject')
       if cwd == None :
@@ -111,7 +195,7 @@ class Core():
       shutil.copytree(os.path.join(self.appcwd,'templates/newproject'), cwd)
       self.changeCWD(cwd)
       self.loadDocSettings()
-      # self.docsettings = json.loads(open(os.path.join(cwd,'.config/prefs.json')).read())
+      # self.docsettings = json.loads(open(os.path.join(cwd,'.config/docsettings.json')).read())
       self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
       self.repository = git.Repo.init(cwd)
       self.repository.index.add(['assets','contents','.config'])

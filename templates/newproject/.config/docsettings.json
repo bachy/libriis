@@ -1,0 +1,19 @@
+{
+  "git.user.name":"Cascade",
+  "git.user.email":"cascade@figureslibres.io",
+  "docsettings":{
+    "pw":210,
+    "ph":297,
+    "mt":15,
+    "mb":15,
+    "me":10,
+    "mi":15,
+    "cs":5,
+    "bs":5,
+    "cn": 6,
+    "cg": 5,
+    "rn": 12,
+    "rg": 4,
+    "lh": 3
+  }
+}
