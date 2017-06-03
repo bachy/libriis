@@ -67,6 +67,18 @@ class WebkitView(QWebView):
       self.initPDF()
       self.reload()
 
+   def toggleDocClass(self, c="",a=True):
+      if a :
+         togg = "add"
+      else :
+         togg = "remove"
+      command = """document.documentElement.classList."""+togg+"""('"""+c+"""')"""
+      self.evaluateJS(command)
+
+
+   def evaluateJS(self, command):
+      self.page().mainFrame().evaluateJavaScript(command)
+
 class WebkitInspector(QWebInspector):
    def __init__(self, parent, webkitview):
       super(WebkitInspector, self).__init__(parent)
@@ -90,7 +102,7 @@ class WebViewToolBar(QWidget):
       self.hbox = QHBoxLayout()
       self.hbox.setContentsMargins(0,0,0,0)
 
-      self.preview = QCheckBox('&Preview', self)
+      self.preview = QCheckBox('Prev&iew', self)
       # self.preview.setShortcut('Ctrl+Shift+p')
       self.preview.clicked.connect(self.onPreview)
       self.hbox.addWidget(self.preview)
@@ -153,17 +165,16 @@ class WebViewToolBar(QWidget):
       self.setLayout(self.hbox)
 
    def onPreview(self):
-      print('onPreview')
+      self.parent.webkitview.toggleDocClass('preview', self.preview.isChecked())
 
    def onDebug(self):
-      print('onDebug')
+      self.parent.webkitview.toggleDocClass('debug', self.debug.isChecked())
 
    def onGrid(self):
-      print('onGrid')
+      self.parent.webkitview.toggleDocClass('grid', self.grid.isChecked())
 
    def onSpread(self):
-      print('onSpread')
-
+      self.parent.webkitview.toggleDocClass('spread', self.spread.isChecked())
 
    def onReload(self):
       print("onReload")
