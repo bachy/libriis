@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-
 # @Author: Bachir Soussi Chiadmi <bach>
 # @Date:   23-05-2017
 # @Email:  bachir@figureslibres.io
 # @Last modified by:   bach
-# @Last modified time: 21-04-2017
+# @Last modified time: 03-06-2017
 # @License: GPL-V3
 
 import os
@@ -37,6 +36,11 @@ class MainWindow(QMainWindow):
 
       self.show()
 
+   #     __  ___                 ____
+   #    /  |/  /__  ____  __  __/ __ )____ ______
+   #   / /|_/ / _ \/ __ \/ / / / __  / __ `/ ___/
+   #  / /  / /  __/ / / / /_/ / /_/ / /_/ / /
+   # /_/  /_/\___/_/ /_/\__,_/_____/\__,_/_/
    def initMenuBar(self):
       # menu bar
       bar = self.menuBar()
@@ -228,12 +232,10 @@ class MainWindow(QMainWindow):
       else:
          self.core.quit()
 
-
    def oneditmenutrigger(self, q):
       print(q.text()+" is triggered")
       if q.text() == "&Reload":
          self.designstack.webkitview.reload()
-
 
    def onviewmenutrigger(self, q):
       print(q.text()+" is triggered")
@@ -244,7 +246,11 @@ class MainWindow(QMainWindow):
       elif q.text() == "&Version":
          self.mainstack.setCurrentIndex(2)
 
-
+   #     __  ___      _      _____ __             __
+   #    /  |/  /___ _(_)___ / ___// /_____ ______/ /__
+   #   / /|_/ / __ `/ / __ \\__ \/ __/ __ `/ ___/ //_/
+   #  / /  / / /_/ / / / / /__/ / /_/ /_/ / /__/ ,<
+   # /_/  /_/\__,_/_/_/ /_/____/\__/\__,_/\___/_/|_|
    def initMainStack(self):
       self.mainstack = QStackedWidget()
 

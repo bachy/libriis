@@ -1,6 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# @Author: Bachir Soussi Chiadmi <bach>
+# @Date:   23-05-2017
+# @Email:  bachir@figureslibres.io
+# @Filename: md2html.py
+# @Last modified by:   bach
+# @Last modified time: 03-06-2017
+# @License: GPL-V3
+
 import os
 import re
 from PyQt5.QtCore import QFileSystemWatcher
@@ -99,12 +107,3 @@ class Compiler():
       book_html_f = os.path.join(self.core.cwd,'index.html')
       with open(book_html_f, 'w') as fp:
          fp.write(template_dom.prettify())
-
-
-
-
-
-
-
-
-      #

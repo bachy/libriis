@@ -1,6 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# @Author: Bachir Soussi Chiadmi <bach>
+# @Date:   23-05-2017
+# @Email:  bachir@figureslibres.io
+# @Filename: design.py
+# @Last modified by:   bach
+# @Last modified time: 03-06-2017
+# @License: GPL-V3
+
 import os, re
 # sys,
 from PyQt5 import QtCore
@@ -11,12 +19,14 @@ from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
 
-# from pygments import highlight
-# from pygments.lexers import *
-# from pygments.formatter import Formatter
 from classes import highlighter
 
 
+#  _       __     __  _    ___
+# | |     / /__  / /_| |  / (_)__ _      __
+# | | /| / / _ \/ __ \ | / / / _ \ | /| / /
+# | |/ |/ /  __/ /_/ / |/ / /  __/ |/ |/ /
+# |__/|__/\___/_.___/|___/_/\___/|__/|__/
 class WebkitView(QWebView):
    def __init__(self, parent, core):
       self.parent = parent
@@ -79,6 +89,12 @@ class WebkitView(QWebView):
    def evaluateJS(self, command):
       self.page().mainFrame().evaluateJavaScript(command)
 
+#     ____                           __
+#    /  _/___  _________  ___  _____/ /_____  _____
+#    / // __ \/ ___/ __ \/ _ \/ ___/ __/ __ \/ ___/
+#  _/ // / / (__  ) /_/ /  __/ /__/ /_/ /_/ / /
+# /___/_/ /_/____/ .___/\___/\___/\__/\____/_/
+#               /_/
 class WebkitInspector(QWebInspector):
    def __init__(self, parent, webkitview):
       super(WebkitInspector, self).__init__(parent)
@@ -87,6 +103,11 @@ class WebkitInspector(QWebInspector):
       self.showMaximized()
       # TODO: webkitinspector is disappearing when chaging tabs
 
+#   ______            ______
+#  /_  __/___  ____  / / __ )____ ______
+#   / / / __ \/ __ \/ / __  / __ `/ ___/
+#  / / / /_/ / /_/ / / /_/ / /_/ / /
+# /_/  \____/\____/_/_____/\__,_/_/
 class WebViewToolBar(QWidget):
    def __init__(self, parent):
       super(WebViewToolBar, self).__init__(parent)
@@ -184,7 +205,11 @@ class WebViewToolBar(QWidget):
       print("onGenPDF")
       self.parent.webkitview.ongenPDF()
 
-
+#     ______    ___ __
+#    / ____/___/ (_) /_____  _____
+#   / __/ / __  / / __/ __ \/ ___/
+#  / /___/ /_/ / / /_/ /_/ / /
+# /_____/\__,_/_/\__/\____/_/
 class CodeEditor(QPlainTextEdit):
    def __init__(self, core, tabs, file, mode):
       super(CodeEditor, self).__init__()
@@ -239,7 +264,6 @@ class CodeEditor(QPlainTextEdit):
          self.changed = False
          # TODO: how to combine file save and project save
 
-
 class Editor(QWidget):
    def __init__(self, parent, core):
       super(Editor, self).__init__()
@@ -266,6 +290,11 @@ class Editor(QWidget):
       self.scsstab.setText()
       self.jstab.setText()
 
+#    _____ __             __
+#   / ___// /_____ ______/ /__
+#   \__ \/ __/ __ `/ ___/ //_/
+#  ___/ / /_/ /_/ / /__/ ,<
+# /____/\__/\__,_/\___/_/|_|
 class DesignStack(QWidget):
    def __init__(self, core):
       super(DesignStack, self).__init__()

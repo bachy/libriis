@@ -1,4 +1,17 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+# @Author: Bachir Soussi Chiadmi <bach>
+# @Date:   02-06-2017
+# @Email:  bachir@figureslibres.io
+# @Filename: highlighter.py
+# @Last modified by:   bach
+# @Last modified time: 03-06-2017
+# @License: GPL-V3
+
+# TODO add link to the source
+
+
 import sys
 import re
 from PyQt5 import QtCore, QtGui
@@ -25,9 +38,11 @@ class QFormatter(Formatter):
       Formatter.__init__(self)
       self.data=[]
       self.style = get_style_by_name(style)
-      self.linenos = linenos
+      # self.linenos = linenos
+
       # styles = list(get_all_styles())
       # print(styles)
+
       # Create a dictionary of text styles, indexed
       # by pygments token names, containing QTextCharFormat
       # instances according to pygments' description
@@ -114,19 +129,3 @@ class Highlighter(QtGui.QSyntaxHighlighter):
       # I may need to do something about this being called
       # too quickly.
       self.tstamp=time.time()
-
-
-# if __name__ == "__main__":
-#     app = QtGui.QApplication(sys.argv)
-#
-#     rst = QtGui.QPlainTextEdit()
-#     rst.setWindowTitle('reSt')
-#     hl=Highlighter(rst.document(),"rest")
-#     rst.show()
-#
-#     python = QtGui.QPlainTextEdit()
-#     python.setWindowTitle('python')
-#     hl=Highlighter(python.document(),"python")
-#     python.show()
-#
-#     sys.exit(app.exec_())

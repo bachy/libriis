@@ -1,6 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# @Author: Bachir Soussi Chiadmi <bach>
+# @Date:   30-05-2017
+# @Email:  bachir@figureslibres.io
+# @Filename: sasscompiler.py
+# @Last modified by:   bach
+# @Last modified time: 03-06-2017
+# @License: GPL-V3
+
+
 import os
 from PyQt5.QtCore import QFileSystemWatcher
 import sass

@@ -1,6 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# @Author: Bachir Soussi Chiadmi <bach>
+# @Date:   23-05-2017
+# @Email:  bachir@figureslibres.io
+# @Filename: server.py
+# @Last modified by:   bach
+# @Last modified time: 03-06-2017
+# @License: GPL-V3
 
 import sys, os
 from socket import socket
@@ -8,9 +15,7 @@ import socketserver
 import http.server
 import threading
 
-
 class Server():
-
    def __init__(self, parent):
 
       self.parent = parent

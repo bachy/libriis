@@ -1,6 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# @Author: Bachir Soussi Chiadmi <bach>
+# @Date:   23-05-2017
+# @Email:  bachir@figureslibres.io
+# @Filename: content.py
+# @Last modified by:   bach
+# @Last modified time: 03-06-2017
+# @License: GPL-V3
+
 import os, re
 
 from PyQt5 import QtCore
@@ -127,7 +135,6 @@ class SummaryList(QListWidget):
       # print('onItemActivated', item.data)
       self.parent.parent.editor.openFile(self.currentRow())
 
-
 class SummaryListWidgetItem(QListWidgetItem):
    def __init__(self,parent,data):
       super(SummaryListWidgetItem, self).__init__(parent)
@@ -136,7 +143,6 @@ class SummaryListWidgetItem(QListWidgetItem):
 
       self.setText(data['title'])
       self.setToolTip(data['file'])
-
 
 class SummaryActions(QWidget):
    def __init__(self,parent):
@@ -253,11 +259,11 @@ class MarkdownEditor(QWidget):
          # self.tabs.setTabText(i, re.sub(r'^\*\s', '', self.tabs.tabText(i)))
          # TODO: how to combine file save and project save
 
-#     __  ___      _
-#    /  |/  /___ _(_)___
-#   / /|_/ / __ `/ / __ \
-#  / /  / / /_/ / / / / /
-# /_/  /_/\__,_/_/_/ /_/
+#    _____ __             __
+#   / ___// /_____ ______/ /__
+#   \__ \/ __/ __ `/ ___/ //_/
+#  ___/ / /_/ /_/ / /__/ ,<
+# /____/\__/\__,_/\___/_/|_|
 class ContentStack(QWidget):
    def __init__(self, core):
       super(ContentStack, self).__init__()
