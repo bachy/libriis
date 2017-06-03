@@ -119,7 +119,7 @@ class Core():
 
    def updateScss(self):
       # print(self.docsettings)
-      sassfilepath = os.path.join(self.cwd,'assets/css/main.scss')
+      sassfilepath = os.path.join(self.cwd,'assets/css/setup.scss')
       # print(sassfilepath)
       sass = open(sassfilepath,"r").read()
       sets = {

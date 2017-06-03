@@ -143,9 +143,9 @@ class WebViewToolBar(QWidget):
       # self.spread.setShortcut('Ctrl+Shift+g')
       self.spread.clicked.connect(self.onSpread)
       self.hbox.addWidget(self.spread)
-
+      # 
       self.hbox.addStretch()
-
+      #
       # zoom
       self.hbox.addWidget(QLabel("Zoom:"))
       self.zoom = QSpinBox(self)
@@ -164,11 +164,9 @@ class WebViewToolBar(QWidget):
       # self.addpage.setIcon(Icon(ico)))
       # self.addpage.clicked.connect(self.onAddPage)
       self.hbox.addWidget(self.addpage)
-
+      #
       self.hbox.addStretch()
-
-
-
+      #
       self.reload = QPushButton("&Reload", self)
       # self.reload.setShortcut('Ctrl+Shift+r')
       # TODO: how to define same shortcut in different places

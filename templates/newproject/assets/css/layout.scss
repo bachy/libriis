@@ -43,13 +43,22 @@
     z-index: 500;
 }
 
-// .body:before,
-// .body:after { bottom: $line-height * -3; }
+.body:before{
+  top:-2em;
+  width:100%;
+  text-align: center;
+}
+.body:after{
+  bottom:-2em;
+  width:100%;
+  text-align: center;
+}
+
 
 /*gauche*/
-.paper:nth-child(odd) .body:before { content: "Cascade, default header"; }
+.paper:nth-child(odd) .body:before { content: $header-odd; }
 /*droite*/
-.paper:nth-child(even) .body:before { content: "Cascade, default header"; }
+.paper:nth-child(even) .body:before { content: $header-even; }
 
 .body:after  { content: counter(folio); z-index: 499;}
 
