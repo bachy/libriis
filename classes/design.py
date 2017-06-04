@@ -150,17 +150,20 @@ class WebViewToolBar(QWidget):
       self.hbox.addWidget(self.zoom)
 
       # page
-      self.hbox.addWidget(QLabel("Page:"))
+      self.gotopage = QLabel("Go to Page: /"+self.parent.core.docsettings['np'])
+      # TODO: refresh page number on change
+      self.hbox.addWidget(self.gotopage)
       self.page = QSpinBox(self)
       # TODO: action
       self.hbox.addWidget(self.page)
 
       self.addpage = QPushButton("&Add Page", self)
-      # self.addpage.setShortcut('Ctrl+Shift+n')
-      # TODO: how to define same shortcut in different places
-      # self.addpage.setIcon(Icon(ico)))
       self.addpage.clicked.connect(self.onAddPage)
       self.hbox.addWidget(self.addpage)
+      self.rmpage = QPushButton("Re&move Page", self)
+      self.rmpage.clicked.connect(self.onRmPage)
+      self.hbox.addWidget(self.rmpage)
+
       #
       self.hbox.addStretch()
       #
@@ -316,6 +319,7 @@ class Editor(QWidget):
 class DesignStack(QWidget):
    def __init__(self, core):
       super(DesignStack, self).__init__()
+      self.core = core
 
       # self.grid = QGridLayout()
       self.hbox = QHBoxLayout()
@@ -328,18 +332,21 @@ class DesignStack(QWidget):
       self.webview.setLayout(self.webview.vbox)
       self.webview.vbox.setContentsMargins(0,0,0,0)
 
+      # toolbar
+      self.webviewtoolbar = WebViewToolBar(self)
+      self.webview.vbox.addWidget(self.webviewtoolbar)
+
+      # webkitview
       self.webkitview = WebkitView(self, core)
 
+      # webkitinspector
       self.webkitinspector = WebkitInspector(self, self.webkitview)
-
       shortcut = QShortcut(self)
       shortcut.setKey("F12")
       shortcut.activated.connect(self.toggleInspector)
       self.webkitinspector.setVisible(False)
 
-      self.webviewtoolbar = WebViewToolBar(self)
-      self.webview.vbox.addWidget(self.webviewtoolbar)
-
+      # V layout
       self.vsplitter = QSplitter(QtCore.Qt.Vertical)
       self.vsplitter.addWidget(self.webkitview)
       self.vsplitter.addWidget(self.webkitinspector)
@@ -347,9 +354,11 @@ class DesignStack(QWidget):
 
       self.webview.vbox.addWidget(self.vsplitter)
 
+      # H layout
       self.hsplitter = QSplitter(QtCore.Qt.Horizontal)
       self.hsplitter.addWidget(self.webview)
 
+      # editor
       self.editor = Editor(self, core)
       self.hsplitter.addWidget(self.editor)
 

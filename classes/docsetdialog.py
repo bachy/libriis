@@ -36,6 +36,11 @@ class DocsetDialog(QDialog):
       self.formGroupBox = QGroupBox()
       layout = QFormLayout()
 
+      self.np = FormLineEdit(str(ds['np']),3,True)
+      layout.addRow(QLabel("Numbers of Pages:"), self.np)
+      #
+      layout.addRow(Line(self))
+      #
       self.pw = FormLineEdit(str(ds['pw']))
       layout.addRow(QLabel("Page Width (mm):"), self.pw)
       self.ph = FormLineEdit(str(ds['ph']))

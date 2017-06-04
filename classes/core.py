@@ -115,9 +115,10 @@ class Core():
       with open(jsonfilepath, "w") as fp:
          json.dump(self.docsettings, fp, ensure_ascii=False, indent="\t")
 
-      self.updateScss()
+      self.updateScss(False)
+      self.updateJs()
 
-   def updateScss(self):
+   def updateScss(self, reload=True):
       # print(self.docsettings)
       sassfilepath = os.path.join(self.cwd,'assets/css/setup.scss')
       # print(sassfilepath)
@@ -156,7 +157,34 @@ class Core():
       # print('sass', sass)
       open(sassfilepath,"w").write(sass)
 
-      self._mw.designstack.webkitview.reload()
+      if reload:
+         self._mw.designstack.webkitview.reload()
+
+   def updateJs(self, reload=True):
+      # print(self.docsettings)
+      jsfilepath = os.path.join(self.cwd,'assets/js/setup.js')
+      # print(jsfilepath)
+      js = open(jsfilepath,"r").read()
+
+      # $row-number: 12;
+      js = re.sub(
+         r'nb_page=[0-9]+;',
+         'nb_page='+str(self.docsettings['np'])+';',
+         js)
+
+      # print('sass', sass)
+      open(jsfilepath,"w").write(js)
+
+      if reload:
+         self._mw.designstack.webkitview.reload()
+
+   def addPage(self):
+      self.docsettings['np'] = int(self.docsettings['np'])+1
+      self.updateJs()
+
+   def rmPage(self):
+      self.docsettings['np'] = int(self.docsettings['np'])-1
+      self.updateJs()
 
    #     ____               _           __
    #    / __ \_________    (_)__  _____/ /_

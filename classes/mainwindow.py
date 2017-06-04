@@ -202,6 +202,7 @@ class MainWindow(QMainWindow):
       d = docsetdialog.DocsetDialog(self)
       d.exec_()
       self.core.recordDocSettings({
+         "np":d.np.text(),
          "pw":d.pw.text(),
          "ph":d.ph.text(),
          "mt":d.mt.text(),
@@ -263,5 +264,7 @@ class MainWindow(QMainWindow):
       self.mainstack.addWidget(self.versionstack)
 
       self.mainstack.setCurrentIndex(self.core.mw_curstack)
+
+      # TODO: add an app console window (show sass compilation errors for example)
 
       self.setCentralWidget(self.mainstack)
