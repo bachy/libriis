@@ -44,8 +44,8 @@ class WebkitView(QWebView):
       # print(self.mainframe)
 
    def onLoaded(self):
-      print("onLoaded")
-      self.parent.webviewtoolbar.onReload()
+      print("WebView : onLoaded")
+      self.parent.webviewtoolbar.onRefresh()
 
    def initPDF(self):
       self.printer = QPrinter(QPrinter.HighResolution)
@@ -185,46 +185,62 @@ class WebViewToolBar(QWidget):
 
    # def onCheckboxAction(self, box):
    #    self.parent.webkitview.toggleDocClass(box, self[box].isChecked())
-   #    self.recordDocSettings(box, self[box].isChecked())
+   #    self.recToolbarState(box, self[box].isChecked())
 
    def onPreview(self):
+      print('Toolbar : onPreview', self.preview.isChecked())
       self.parent.webkitview.toggleDocClass('preview', self.preview.isChecked())
-      self.recordDocSettings('preview', self.preview.isChecked())
+      self.recToolbarState('preview', self.preview.isChecked())
 
    def onDebug(self):
       self.parent.webkitview.toggleDocClass('debug', self.debug.isChecked())
-      self.recordDocSettings('debug', self.debug.isChecked())
+      self.recToolbarState('debug', self.debug.isChecked())
 
    def onGrid(self):
       self.parent.webkitview.toggleDocClass('grid', self.grid.isChecked())
-      self.recordDocSettings('grid', self.grid.isChecked())
+      self.recToolbarState('grid', self.grid.isChecked())
 
    def onSpread(self):
       self.parent.webkitview.toggleDocClass('spread', self.spread.isChecked())
-      self.recordDocSettings('spread', self.spread.isChecked())
+      self.recToolbarState('spread', self.spread.isChecked())
 
    def onAddPage(self):
       print("onAddPage")
+      self.parent.core.addPage()
+      # self.refreshNumberPage()
+
+   def onRmPage(self):
+      print("onAddPage")
+      self.parent.core.rmPage()
+      # self.refreshNumberPage()
+
+   # def refreshNumberPage(self):
 
    def onReload(self):
       print("onReload")
+      self.parent.webkitview.reload()
 
    def onGenPDF(self):
       print("onGenPDF")
       self.parent.webkitview.ongenPDF()
 
-   def recordDocSettings(self, prop, val):
-      print('recordDocSettings : '+prop, val)
+   def recToolbarState(self, prop, val):
+      print('recToolbarState : '+prop, val)
       settings = QSettings('FiguresLibres', 'Cascade')
       settings.setValue('design/toolbar/'+prop, val)
+      print('recToolbarState after : '+prop, settings.value('design/toolbar/'+prop))
 
-   def onReload(self):
+   def onRefresh(self):
+      print('Toolbar : onrefresh')
       # apply precedent toolbar state
       settings = QSettings('FiguresLibres', 'Cascade')
-      self.preview.setChecked(settings.value('design/toolbar/preview', "false") == "true")
-      self.debug.setChecked(settings.value('design/toolbar/debug', "false") == "true")
-      self.grid.setChecked(settings.value('design/toolbar/grid', "false") == "true")
-      self.spread.setChecked(settings.value('design/toolbar/spread', "false") == "true")
+      # TODO: checkbox state restore are not working
+      self.preview.setChecked(bool(settings.value('design/toolbar/preview', "False")))
+      self.debug.setChecked(bool(settings.value('design/toolbar/debug', "False")))
+      self.grid.setChecked(bool(settings.value('design/toolbar/grid', "False")))
+      self.spread.setChecked(bool(settings.value('design/toolbar/spread', "False")))
+
+      self.gotopage.setText("Go to Page: /"+str(self.parent.core.docsettings['np']))
 
 #     ______    ___ __
 #    / ____/___/ (_) /_____  _____
