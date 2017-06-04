@@ -34,6 +34,7 @@ class WebkitView(QWebView):
       self.port = core.server.port
       self.view = QWebView.__init__(self, parent)
       self.setZoomFactor(1)
+      self.loadFinished.connect(self.onLoaded)
       self.load(QUrl('http://localhost:'+str(self.port)))
       self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
       # self.settings().setAttribute(QWebSettings.PluginsEnabled, True)
@@ -41,6 +42,10 @@ class WebkitView(QWebView):
       self.initPDF()
       # self.mainframe = self.page.mainFrame()
       # print(self.mainframe)
+
+   def onLoaded(self):
+      print("onLoaded")
+      self.parent.webviewtoolbar.onReload()
 
    def initPDF(self):
       self.printer = QPrinter(QPrinter.HighResolution)
@@ -58,7 +63,6 @@ class WebkitView(QWebView):
       self.printer.setDocName(self.core.projectname)
       self.printer.setOutputFileName(self.core.projectname+".pdf")
       # self.setFixedWidth(1000)
-
 
    def ongenPDF(self):
       # QPrinter::Custom
@@ -84,7 +88,6 @@ class WebkitView(QWebView):
          togg = "remove"
       command = """document.documentElement.classList."""+togg+"""('"""+c+"""')"""
       self.evaluateJS(command)
-
 
    def evaluateJS(self, command):
       self.page().mainFrame().evaluateJavaScript(command)
@@ -119,31 +122,25 @@ class WebViewToolBar(QWidget):
       font.setPointSize(8)
       self.setFont(font)
 
-
       self.hbox = QHBoxLayout()
       self.hbox.setContentsMargins(0,0,0,0)
 
       self.preview = QCheckBox('Prev&iew', self)
-      # self.preview.setShortcut('Ctrl+Shift+p')
-      self.preview.clicked.connect(self.onPreview)
+      self.preview.stateChanged.connect(self.onPreview)
       self.hbox.addWidget(self.preview)
 
       self.debug = QCheckBox('Deb&ug', self)
-      # self.debug.setShortcut('Ctrl+Shift+u')
-      self.debug.clicked.connect(self.onDebug)
+      self.debug.stateChanged.connect(self.onDebug)
       self.hbox.addWidget(self.debug)
 
       self.grid = QCheckBox('&Grid', self)
-      # self.grid.setShortcut('Ctrl+Shift+g')
-      self.grid.clicked.connect(self.onGrid)
+      self.grid.stateChanged.connect(self.onGrid)
       self.hbox.addWidget(self.grid)
 
-      # spread
       self.spread = QCheckBox('&Spread', self)
-      # self.spread.setShortcut('Ctrl+Shift+g')
-      self.spread.clicked.connect(self.onSpread)
+      self.spread.stateChanged.connect(self.onSpread)
       self.hbox.addWidget(self.spread)
-      # 
+      #
       self.hbox.addStretch()
       #
       # zoom
@@ -159,10 +156,10 @@ class WebViewToolBar(QWidget):
       self.hbox.addWidget(self.page)
 
       self.addpage = QPushButton("&Add Page", self)
-      # self.addpage.setShortcut('Ctrl+Shift+r')
+      # self.addpage.setShortcut('Ctrl+Shift+n')
       # TODO: how to define same shortcut in different places
       # self.addpage.setIcon(Icon(ico)))
-      # self.addpage.clicked.connect(self.onAddPage)
+      self.addpage.clicked.connect(self.onAddPage)
       self.hbox.addWidget(self.addpage)
       #
       self.hbox.addStretch()
@@ -183,25 +180,48 @@ class WebViewToolBar(QWidget):
 
       self.setLayout(self.hbox)
 
+   # def onCheckboxAction(self, box):
+   #    self.parent.webkitview.toggleDocClass(box, self[box].isChecked())
+   #    self.recordDocSettings(box, self[box].isChecked())
+
    def onPreview(self):
       self.parent.webkitview.toggleDocClass('preview', self.preview.isChecked())
+      self.recordDocSettings('preview', self.preview.isChecked())
 
    def onDebug(self):
       self.parent.webkitview.toggleDocClass('debug', self.debug.isChecked())
+      self.recordDocSettings('debug', self.debug.isChecked())
 
    def onGrid(self):
       self.parent.webkitview.toggleDocClass('grid', self.grid.isChecked())
+      self.recordDocSettings('grid', self.grid.isChecked())
 
    def onSpread(self):
       self.parent.webkitview.toggleDocClass('spread', self.spread.isChecked())
+      self.recordDocSettings('spread', self.spread.isChecked())
+
+   def onAddPage(self):
+      print("onAddPage")
 
    def onReload(self):
       print("onReload")
-      # self.parent.webkitview.
 
    def onGenPDF(self):
       print("onGenPDF")
       self.parent.webkitview.ongenPDF()
+
+   def recordDocSettings(self, prop, val):
+      print('recordDocSettings : '+prop, val)
+      settings = QSettings('FiguresLibres', 'Cascade')
+      settings.setValue('design/toolbar/'+prop, val)
+
+   def onReload(self):
+      # apply precedent toolbar state
+      settings = QSettings('FiguresLibres', 'Cascade')
+      self.preview.setChecked(settings.value('design/toolbar/preview', "false") == "true")
+      self.debug.setChecked(settings.value('design/toolbar/debug', "false") == "true")
+      self.grid.setChecked(settings.value('design/toolbar/grid', "false") == "true")
+      self.spread.setChecked(settings.value('design/toolbar/spread', "false") == "true")
 
 #     ______    ___ __
 #    / ____/___/ (_) /_____  _____
