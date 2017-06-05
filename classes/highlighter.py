@@ -12,6 +12,7 @@
 # based on code from :
 # Copyright (C) 2008 Christophe Kibleur <kib2@free.fr>
 
+# TODO : see pyQode for more features https://github.com/pyQode
 
 import sys
 import re
@@ -37,9 +38,6 @@ class QFormatter(Formatter):
       self.data=[]
       self.style = get_style_by_name(style)
       # self.linenos = linenos
-
-      # styles = list(get_all_styles())
-      # print(styles)
 
       # Create a dictionary of text styles, indexed
       # by pygments token names, containing QTextCharFormat
@@ -71,8 +69,6 @@ class QFormatter(Formatter):
       # Just store a list of styles, one for each character
       # in the input. Obviously a smarter thing with
       # offsets and lengths is a good idea!
-      print(tokensource)
-
       for ttype, value in tokensource:
          l=len(value)
          t=str(ttype)
@@ -83,12 +79,14 @@ class Highlighter(QSyntaxHighlighter):
 
    def __init__(self, parent, mode):
       QSyntaxHighlighter.__init__(self, parent)
-      # self.tstamp=time.time()
+
+      styles = list(get_all_styles())
+      print(styles)
 
       # Keep the formatter and lexer, initializing them
       # may be costly.
       if not mode == "md":
-         self.formatter=QFormatter(linenos=True, style="monokai-hcb")
+         self.formatter=QFormatter(linenos=True, style="monokai")
       else:
          self.formatter=QFormatter(linenos=False, style="github")
 
@@ -123,7 +121,3 @@ class Highlighter(QSyntaxHighlighter):
             self.setFormat(i,1,self.formatter.data[p+i])
          except IndexError:
             pass
-
-      # I may need to do something about this being called
-      # too quickly.
-      # self.tstamp=time.time()
