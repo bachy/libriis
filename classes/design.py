@@ -89,6 +89,15 @@ class WebkitView(QWebView):
       command = """document.documentElement.classList."""+togg+"""('"""+c+"""')"""
       self.evaluateJS(command)
 
+   def changePage(self,p=0):
+      command = """
+         var pageNumber = """+str(p)+""";
+         var target = document.documentElement.querySelectorAll('.paper')[pageNumber];
+         var offsetTop = target.offsetTop;
+         document.documentElement.querySelector('body').scrollTop = offsetTop;
+      """
+      self.evaluateJS(command)
+
    def evaluateJS(self, command):
       self.page().mainFrame().evaluateJavaScript(command)
 
@@ -156,8 +165,10 @@ class WebViewToolBar(QWidget):
       # page
       self.gotopage = QLabel("Go to Page: /"+self.parent.core.docsettings['np'])
       self.hbox.addWidget(self.gotopage)
-      self.page = QSpinBox(self)
-      # TODO: action
+      self.page = QSpinBox()
+      self.page.setMinimum(0)
+      self.page.setMaximum(int(self.parent.core.docsettings['np']))
+      self.page.valueChanged.connect(self.onChangePage)
       self.hbox.addWidget(self.page)
 
       self.addpage = QPushButton("&Add Page", self)
@@ -211,15 +222,17 @@ class WebViewToolBar(QWidget):
       self.parent.webkitview.toggleDocClass('facing', self.facing.isChecked())
       self.recToolbarState('facing', self.facing.isChecked())
 
+   def onChangePage(self, i):
+      print("onChangePage : "+str(i))
+      self.parent.webkitview.changePage(i)
+
    def onAddPage(self):
       # print("onAddPage")
       self.parent.core.addPage()
-      # self.refreshNumberPage()
 
    def onRmPage(self):
       # print("onAddPage")
       self.parent.core.rmPage()
-      # self.refreshNumberPage()
 
    # def refreshNumberPage(self):
 
@@ -252,7 +265,7 @@ class WebViewToolBar(QWidget):
       self.parent.webkitview.toggleDocClass('spread', self.spread.isChecked())
 
       self.gotopage.setText("Go to Page: /"+str(self.parent.core.docsettings['np']))
-
+      self.parent.webkitview.changePage(self.page.value())
 #     ______    ___ __
 #    / ____/___/ (_) /_____  _____
 #   / __/ / __  / / __/ __ \/ ___/
@@ -323,7 +336,7 @@ class Editor(QWidget):
       # Initialize tab screen
       self.tabs = QTabWidget()
 
-      self.scsstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/css/styles.scss', "scss")
+      self.scsstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/css/styles.scss', "sass")
       self.jstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/js/script.js', 'js')
 
       # Add tabs
