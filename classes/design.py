@@ -94,7 +94,9 @@ class WebkitView(QWebView):
          var pageNumber = """+str(p)+""";
          var target = document.documentElement.querySelectorAll('.paper')[pageNumber];
          var offsetTop = target.offsetTop;
+         var offsetLeft = target.offsetLeft;
          document.documentElement.querySelector('body').scrollTop = offsetTop;
+         document.documentElement.querySelector('body').scrollLeft = offsetLeft;
       """
       self.evaluateJS(command)
 
