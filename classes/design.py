@@ -177,11 +177,6 @@ class WebViewToolBar(QWidget):
       self.zoom.setValue(90)
       self.zoom.valueChanged.connect(self.onZoomChanged)
       self.hbox.addWidget(self.zoom)
-      self.zoomon_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.Key_Plus), self)
-      self.zoomon_shortcut.activated.connect(self.onZoomOn)
-      self.zoomout_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.Key_Minus), self)
-      self.zoomout_shortcut.activated.connect(self.onZoomOut)
-
 
       # page
       self.gotopage = QLabel("Go to Page: /"+self.parent.core.docsettings['np'])
@@ -191,10 +186,6 @@ class WebViewToolBar(QWidget):
       self.page.setMaximum(int(self.parent.core.docsettings['np']))
       self.page.valueChanged.connect(self.onChangePage)
       self.hbox.addWidget(self.page)
-      self.pagenext_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Right), self)
-      self.pagenext_shortcut.activated.connect(self.onNextPage)
-      self.pageprev_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Left), self)
-      self.pageprev_shortcut.activated.connect(self.onPrevPage)
 
       self.addpage = QPushButton("&Add Page", self)
       self.addpage.clicked.connect(self.onAddPage)
@@ -278,8 +269,6 @@ class WebViewToolBar(QWidget):
    def onRmPage(self):
       # print("onAddPage")
       self.parent.core.rmPage()
-
-   # def refreshNumberPage(self):
 
    def onReload(self):
       # print("onReload")
@@ -430,10 +419,6 @@ class DesignStack(QWidget):
 
       # webkitinspector
       self.webkitinspector = WebkitInspector(self, self.webkitview)
-      shortcut = QShortcut(self)
-      shortcut.setKey("F12")
-      shortcut.activated.connect(self.toggleInspector)
-      self.webkitinspector.setVisible(False)
 
       # V layout
       self.vsplitter = QSplitter(QtCore.Qt.Vertical)
@@ -460,6 +445,26 @@ class DesignStack(QWidget):
    def toggleInspector(self):
       self.webkitinspector.setVisible(not self.webkitinspector.isVisible())
 
+   def initShortcuts(self):
+      # inspector
+      shortcut = QShortcut(self)
+      shortcut.setKey("F12")
+      shortcut.activated.connect(self.toggleInspector)
+      self.webkitinspector.setVisible(False)
+
+      # pages
+      # self.pagenext_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Right), self)
+      # self.pagenext_shortcut.activated.connect(self.webviewtoolbar.onNextPage)
+      # self.pageprev_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Left), self)
+      # self.pageprev_shortcut.activated.connect(self.webviewtoolbar.onPrevPage)
+
+      # zoom
+      # self.zoomon_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.Key_Plus), self)
+      # self.zoomon_shortcut.activated.connect(self.webviewtoolbar.onZoomOn)
+      # self.zoomout_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.Key_Minus), self)
+      # self.zoomout_shortcut.activated.connect(self.webviewtoolbar.onZoomOut)
+
+
 
    def restorePrefs(self):
       settings = QSettings('FiguresLibres', 'Cascade')
@@ -475,7 +480,6 @@ class DesignStack(QWidget):
          sizes = []
          for size in vals: sizes.append(int(size))
          self.hsplitter.setSizes(sizes)
-
 
    def movedSplitter(self):
       settings = QSettings('FiguresLibres', 'Cascade')
