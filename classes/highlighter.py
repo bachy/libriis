@@ -9,28 +9,26 @@
 # @Last modified time: 03-06-2017
 # @License: GPL-V3
 
-# TODO add link to the source
+# based on code from :
+# Copyright (C) 2008 Christophe Kibleur <kib2@free.fr>
 
 
 import sys
 import re
-from PyQt5 import QtCore, QtGui
+# from PyQt5 import QtCore
+from PyQt5.QtGui import QColor, QTextCharFormat, QFont, QSyntaxHighlighter
 from pygments import highlight
 from pygments.lexers import *
 from pygments.formatter import Formatter
 from pygments.styles import get_all_styles, get_style_by_name
-import time
+# import time
 
-# Copyright (C) 2008 Christophe Kibleur <kib2@free.fr>
-#
-# This file is part of WikiParser (http://thewikiblog.appspot.com/).
-#
 
 def hex2QColor(c):
    r=int(c[0:2],16)
    g=int(c[2:4],16)
    b=int(c[4:6],16)
-   return QtGui.QColor(r,g,b)
+   return QColor(r,g,b)
 
 
 class QFormatter(Formatter):
@@ -50,14 +48,14 @@ class QFormatter(Formatter):
 
       self.styles={}
       for token, style in self.style:
-         qtf=QtGui.QTextCharFormat()
+         qtf=QTextCharFormat()
 
          if style['color']:
             qtf.setForeground(hex2QColor(style['color']))
          if style['bgcolor']:
             qtf.setBackground(hex2QColor(style['bgcolor']))
          if style['bold']:
-            qtf.setFontWeight(QtGui.QFont.Bold)
+            qtf.setFontWeight(QFont.Bold)
          if style['italic']:
             qtf.setFontItalic(True)
          if style['underline']:
@@ -81,11 +79,11 @@ class QFormatter(Formatter):
          self.data.extend([self.styles[t],]*l)
 
 
-class Highlighter(QtGui.QSyntaxHighlighter):
+class Highlighter(QSyntaxHighlighter):
 
    def __init__(self, parent, mode):
-      QtGui.QSyntaxHighlighter.__init__(self, parent)
-      self.tstamp=time.time()
+      QSyntaxHighlighter.__init__(self, parent)
+      # self.tstamp=time.time()
 
       # Keep the formatter and lexer, initializing them
       # may be costly.
@@ -128,4 +126,4 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 
       # I may need to do something about this being called
       # too quickly.
-      self.tstamp=time.time()
+      # self.tstamp=time.time()

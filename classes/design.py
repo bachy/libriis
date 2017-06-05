@@ -155,7 +155,6 @@ class WebViewToolBar(QWidget):
 
       # page
       self.gotopage = QLabel("Go to Page: /"+self.parent.core.docsettings['np'])
-      # TODO: refresh page number on change
       self.hbox.addWidget(self.gotopage)
       self.page = QSpinBox(self)
       # TODO: action
@@ -213,19 +212,19 @@ class WebViewToolBar(QWidget):
       self.recToolbarState('facing', self.facing.isChecked())
 
    def onAddPage(self):
-      print("onAddPage")
+      # print("onAddPage")
       self.parent.core.addPage()
       # self.refreshNumberPage()
 
    def onRmPage(self):
-      print("onAddPage")
+      # print("onAddPage")
       self.parent.core.rmPage()
       # self.refreshNumberPage()
 
    # def refreshNumberPage(self):
 
    def onReload(self):
-      print("onReload")
+      # print("onReload")
       self.parent.webkitview.reload()
 
    def onGenPDF(self):
@@ -233,10 +232,10 @@ class WebViewToolBar(QWidget):
       self.parent.webkitview.ongenPDF()
 
    def recToolbarState(self, prop, val):
-      print('recToolbarState : '+prop, val)
+      # print('recToolbarState : '+prop, val)
       settings = QSettings('FiguresLibres', 'Cascade')
       settings.setValue('design/toolbar/'+prop, val)
-      print('recToolbarState after : '+prop, settings.value('design/toolbar/'+prop))
+      # print('recToolbarState after : '+prop, settings.value('design/toolbar/'+prop))
 
    def onRefresh(self):
       # apply precedent toolbar state
@@ -260,48 +259,47 @@ class WebViewToolBar(QWidget):
 #  / /___/ /_/ / / /_/ /_/ / /
 # /_____/\__,_/_/\__/\____/_/
 class CodeEditor(QPlainTextEdit):
-   def __init__(self, core, tabs, file, mode):
+   def __init__(self, parent, core, tabs, file, mode):
       super(CodeEditor, self).__init__()
+      self.parent = parent
       self.core = core
       self.tabs = tabs
       self.file = file
+      self.hl= highlighter.Highlighter(self.document(),mode)
       self.setText()
       self.setTabStopWidth(15)
-      self.hl= highlighter.Highlighter(self.document(),mode)
+
+      self.textChanged.connect(self.onTextChanged)
 
       self.shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
       self.shortcut.activated.connect(self.save)
 
    def setText(self):
-      try:
-         self.textChanged.disconnect(self.onTextChanged)
-      except Exception as e:
-         print(e)
+      # try:
+      #    self.textChanged.disconnect(self.onTextChanged)
+      # except Exception as e:
+      #    print(e)
 
       self.filepath = os.path.join(self.core.cwd,self.file)
       self.clear()
       self.insertPlainText(open(self.filepath, 'r').read())
       self.changed = False
-      self.textChanged.connect(self.onTextChanged)
-
 
       font = QFont()
       font.setFamily("Droid Sans Mono")
       font.setFixedPitch(True)
       font.setPointSize(12)
       self.setFont(font)
-      # self.highlighter = Highlighter(self.document())
-      # https://pypi.python.org/pypi/QScintilla/2.9.2
-
 
 
    def onTextChanged(self):
-      # print('textChanged')
+      print('textChanged')
       # print(self.toPlainText())
       # open(self.filepath, 'w').write(self.toPlainText())
       if not self.changed:
          self.changed = True
          i = self.tabs.currentIndex()
+         # self.tabs.setTabText(i, re.sub(r'^\**\s', '', self.tabs.tabText(i)))
          self.tabs.setTabText(i, "* "+self.tabs.tabText(i))
          # TODO: indicate that webview needs to be reloaded
 
@@ -309,14 +307,15 @@ class CodeEditor(QPlainTextEdit):
       if self.changed:
          open(self.filepath, 'w').write(self.toPlainText())
          i = self.tabs.currentIndex()
-         self.tabs.setTabText(i, re.sub(r'^\*\s', '', self.tabs.tabText(i)))
+         self.tabs.setTabText(i, re.sub(r'^\**\s', '', self.tabs.tabText(i)))
+         self.parent.reloadView()
          self.changed = False
          # TODO: how to combine file save and project save
 
 class Editor(QWidget):
-   def __init__(self, parent, core):
+   def __init__(self, parent):
       super(Editor, self).__init__()
-      self.core = core
+      self.parent = parent
 
       self.layout = QVBoxLayout(self)
       self.layout.setContentsMargins(0,0,0,0)
@@ -324,8 +323,8 @@ class Editor(QWidget):
       # Initialize tab screen
       self.tabs = QTabWidget()
 
-      self.scsstab = CodeEditor(core, self.tabs, 'assets/css/styles.scss', "scss")
-      self.jstab = CodeEditor(core, self.tabs, 'assets/js/script.js', 'js')
+      self.scsstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/css/styles.scss', "scss")
+      self.jstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/js/script.js', 'js')
 
       # Add tabs
       self.tabs.addTab(self.scsstab,"scss")
@@ -338,6 +337,9 @@ class Editor(QWidget):
    def refresh(self):
       self.scsstab.setText()
       self.jstab.setText()
+
+   def reloadView(self):
+      self.parent.webkitview.reload()
 
 #    _____ __             __
 #   / ___// /_____ ______/ /__
@@ -387,7 +389,7 @@ class DesignStack(QWidget):
       self.hsplitter.addWidget(self.webview)
 
       # editor
-      self.editor = Editor(self, core)
+      self.editor = Editor(self)
       self.hsplitter.addWidget(self.editor)
 
       self.hsplitter.splitterMoved.connect(self.movedSplitter)
