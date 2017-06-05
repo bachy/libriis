@@ -12,7 +12,7 @@
 import os, re
 # sys,
 from PyQt5 import QtCore
-from PyQt5.QtCore import QUrl, QSettings, QSizeF
+from PyQt5.QtCore import QUrl, QSettings, QSizeF, Qt
 from PyQt5.QtGui import QKeySequence, QFont
 from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox, QSpinBox, QLabel
 from PyQt5.QtWebKit import QWebSettings
@@ -89,9 +89,19 @@ class WebkitView(QWebView):
       command = """document.documentElement.classList."""+togg+"""('"""+c+"""')"""
       self.evaluateJS(command)
 
+   def zoom(self,z):
+      self.setZoomFactor(z/100)
+      # command = """
+      #    var zoomLevel = """+str(z)+""" / 100;
+      #    var elt = document.documentElement.querySelector("#pages");
+      #    elt.style.webkitTransform = "scale(" + zoomLevel + ")";
+      #    elt.style.webkitTransformOrigin = "0 0";
+      # """
+      # self.evaluateJS(command)
+
    def changePage(self,p=0):
       command = """
-         var pageNumber = """+str(p)+""";
+         var pageNumber = """+str(p-1)+""";
          var target = document.documentElement.querySelectorAll('.paper')[pageNumber];
          var offsetTop = target.offsetTop;
          var offsetLeft = target.offsetLeft;
@@ -161,17 +171,30 @@ class WebViewToolBar(QWidget):
       # zoom
       self.hbox.addWidget(QLabel("Zoom:"))
       self.zoom = QSpinBox(self)
-      # TODO: action
+      self.zoom.setMinimum(-100)
+      self.zoom.setMaximum(200)
+      self.zoom.setSingleStep(10)
+      self.zoom.setValue(90)
+      self.zoom.valueChanged.connect(self.onZoomChanged)
       self.hbox.addWidget(self.zoom)
+      self.zoomon_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.Key_Plus), self)
+      self.zoomon_shortcut.activated.connect(self.onZoomOn)
+      self.zoomout_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.Key_Minus), self)
+      self.zoomout_shortcut.activated.connect(self.onZoomOut)
+
 
       # page
       self.gotopage = QLabel("Go to Page: /"+self.parent.core.docsettings['np'])
       self.hbox.addWidget(self.gotopage)
-      self.page = QSpinBox()
-      self.page.setMinimum(0)
+      self.page = QSpinBox(self)
+      self.page.setMinimum(1)
       self.page.setMaximum(int(self.parent.core.docsettings['np']))
       self.page.valueChanged.connect(self.onChangePage)
       self.hbox.addWidget(self.page)
+      self.pagenext_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Right), self)
+      self.pagenext_shortcut.activated.connect(self.onNextPage)
+      self.pageprev_shortcut = QShortcut(QKeySequence(Qt.ControlModifier+Qt.ShiftModifier+Qt.Key_Left), self)
+      self.pageprev_shortcut.activated.connect(self.onPrevPage)
 
       self.addpage = QPushButton("&Add Page", self)
       self.addpage.clicked.connect(self.onAddPage)
@@ -224,9 +247,29 @@ class WebViewToolBar(QWidget):
       self.parent.webkitview.toggleDocClass('facing', self.facing.isChecked())
       self.recToolbarState('facing', self.facing.isChecked())
 
+   def onZoomChanged(self,i):
+      # print("onZoomChanged : "+str(i))
+      self.parent.webkitview.zoom(i)
+
+   def onZoomOn(self):
+      # print("onZoomOn")
+      self.zoom.setValue(self.zoom.value()+self.zoom.singleStep())
+
+   def onZoomOut(self):
+      # print("onZoomOut")
+      self.zoom.setValue(self.zoom.value()-self.zoom.singleStep())
+
    def onChangePage(self, i):
-      print("onChangePage : "+str(i))
+      # print("onChangePage : "+str(i))
       self.parent.webkitview.changePage(i)
+
+   def onNextPage(self):
+      # print('onNextPage')
+      self.page.setValue(self.page.value()+self.page.singleStep())
+
+   def onPrevPage(self):
+      # print('onPrevPage')
+      self.page.setValue(self.page.value()-self.page.singleStep())
 
    def onAddPage(self):
       # print("onAddPage")
@@ -267,6 +310,7 @@ class WebViewToolBar(QWidget):
       self.parent.webkitview.toggleDocClass('spread', self.spread.isChecked())
 
       self.gotopage.setText("Go to Page: /"+str(self.parent.core.docsettings['np']))
+      self.page.setMaximum(int(self.parent.core.docsettings['np']))
       self.parent.webkitview.changePage(self.page.value())
 #     ______    ___ __
 #    / ____/___/ (_) /_____  _____
@@ -286,8 +330,8 @@ class CodeEditor(QPlainTextEdit):
 
       self.textChanged.connect(self.onTextChanged)
 
-      self.shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
-      self.shortcut.activated.connect(self.save)
+      self.save_shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
+      self.save_shortcut.activated.connect(self.save)
 
    def setText(self):
       # try:
