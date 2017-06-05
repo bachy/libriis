@@ -140,6 +140,10 @@ class WebViewToolBar(QWidget):
       self.spread = QCheckBox('&Spread', self)
       self.spread.stateChanged.connect(self.onSpread)
       self.hbox.addWidget(self.spread)
+
+      self.facing = QCheckBox('Fa&cing', self)
+      self.facing.stateChanged.connect(self.onFacing)
+      self.hbox.addWidget(self.facing)
       #
       self.hbox.addStretch()
       #
@@ -204,6 +208,10 @@ class WebViewToolBar(QWidget):
       self.parent.webkitview.toggleDocClass('spread', self.spread.isChecked())
       self.recToolbarState('spread', self.spread.isChecked())
 
+   def onFacing(self):
+      self.parent.webkitview.toggleDocClass('facing', self.facing.isChecked())
+      self.recToolbarState('facing', self.facing.isChecked())
+
    def onAddPage(self):
       print("onAddPage")
       self.parent.core.addPage()
@@ -231,14 +239,18 @@ class WebViewToolBar(QWidget):
       print('recToolbarState after : '+prop, settings.value('design/toolbar/'+prop))
 
    def onRefresh(self):
-      print('Toolbar : onrefresh')
       # apply precedent toolbar state
       settings = QSettings('FiguresLibres', 'Cascade')
-      # TODO: checkbox state restore are not working
-      self.preview.setChecked(bool(settings.value('design/toolbar/preview', "False")))
-      self.debug.setChecked(bool(settings.value('design/toolbar/debug', "False")))
-      self.grid.setChecked(bool(settings.value('design/toolbar/grid', "False")))
-      self.spread.setChecked(bool(settings.value('design/toolbar/spread', "False")))
+      self.preview.setChecked(bool(settings.value('design/toolbar/preview', False, type=bool)))
+      self.debug.setChecked(bool(settings.value('design/toolbar/debug', False, type=bool)))
+      self.grid.setChecked(bool(settings.value('design/toolbar/grid', False, type=bool)))
+      self.spread.setChecked(bool(settings.value('design/toolbar/spread', False, type=bool)))
+      self.facing.setChecked(bool(settings.value('design/toolbar/facing', False, type=bool)))
+      # trigger webview changes
+      self.parent.webkitview.toggleDocClass('preview', self.preview.isChecked())
+      self.parent.webkitview.toggleDocClass('debug', self.debug.isChecked())
+      self.parent.webkitview.toggleDocClass('grid', self.grid.isChecked())
+      self.parent.webkitview.toggleDocClass('spread', self.spread.isChecked())
 
       self.gotopage.setText("Go to Page: /"+str(self.parent.core.docsettings['np']))
 
