@@ -11,7 +11,7 @@
 import os
 # from PyQt5.QtCore import QLine
 from PyQt5.QtGui import QIcon, QIntValidator
-from PyQt5.QtWidgets import QWidget, QLabel, QDialog, QGroupBox, QDialogButtonBox, QVBoxLayout, QFormLayout, QLineEdit, QComboBox, QSpinBox, QFrame
+from PyQt5.QtWidgets import QWidget, QLabel, QDialog, QGroupBox, QDialogButtonBox, QVBoxLayout, QHBoxLayout, QFormLayout, QLineEdit, QComboBox, QSpinBox, QFrame
 
 class DocsetDialog(QDialog):
    def __init__(self, parent):
@@ -28,64 +28,95 @@ class DocsetDialog(QDialog):
       mainLayout.addWidget(buttonBox)
       self.setLayout(mainLayout)
 
-      self.setWindowTitle("Doc settings")
+      self.setWindowTitle("Document settings")
 
    def createFormGroupBox(self):
       ds = self.parent.core.docsettings
 
-      self.formGroupBox = QGroupBox()
-      layout = QFormLayout()
+      self.formGroupBox = QWidget()
+      vbox = QVBoxLayout()
+      vbox.setContentsMargins(0,0,0,0)
+      self.formGroupBox.setLayout(vbox)
 
-      self.np = FormLineEdit(str(ds['np']),3,True)
-      layout.addRow(QLabel("Numbers of Pages:"), self.np)
-      #
-      layout.addRow(Line(self))
-      #
-      self.pw = FormLineEdit(str(ds['pw']))
-      layout.addRow(QLabel("Page Width (mm):"), self.pw)
-      self.ph = FormLineEdit(str(ds['ph']))
-      layout.addRow(QLabel("Page Height (mm):"), self.ph)
-      #
-      layout.addRow(Line(self))
-      #
-      self.mt = FormLineEdit(str(ds['mt']),3)
-      layout.addRow(QLabel("Margin Top (mm):"), self.mt)
-      self.mb = FormLineEdit(str(ds['mb']),3)
-      layout.addRow(QLabel("Margin Bottom (mm):"), self.mb)
-      self.mi = FormLineEdit(str(ds['mi']),3)
-      layout.addRow(QLabel("Margin inner (mm):"), self.mi)
-      self.me = FormLineEdit(str(ds['me']),3)
-      layout.addRow(QLabel("Margin external (mm):"), self.me)
-      #
-      layout.addRow(Line(self))
-      #
-      self.cs = FormLineEdit(str(ds['cs']),3)
-      layout.addRow(QLabel("Crop size (mm):"), self.cs)
-      self.bs = FormLineEdit(str(ds['bs']),3)
-      layout.addRow(QLabel("Bleed size (mm):"), self.bs)
-      #
-      layout.addRow(Line(self))
-      #
-      self.cn = FormLineEdit(str(ds['cn']),2,True)
-      layout.addRow(QLabel("Columns number:"), self.cn)
-      self.cg = FormLineEdit(str(ds['cg']),2)
-      layout.addRow(QLabel("Columns gutters:"), self.cg)
-      #
-      self.rn = FormLineEdit(str(ds['rn']),2,True)
-      layout.addRow(QLabel("Rows number:"), self.rn)
-      self.rg = FormLineEdit(str(ds['rg']),2)
-      layout.addRow(QLabel("Rows gutters:"), self.rg)
-      #
-      layout.addRow(Line(self))
-      #
-      self.lh = FormLineEdit(str(ds['lh']),2,True)
-      layout.addRow(QLabel("Line height:"), self.lh)
+      topGroupBox = QWidget()
+      topformlayout = QFormLayout()
+      topformlayout.setContentsMargins(0,0,0,0)
+      topGroupBox.setLayout(topformlayout)
+      vbox.addWidget(topGroupBox)
 
-      self.formGroupBox.setLayout(layout)
+      colsGroupBox = QWidget()
+      hbox = QHBoxLayout()
+      hbox.setContentsMargins(0,0,0,0)
+      colsGroupBox.setLayout(hbox)
+      vbox.addWidget(colsGroupBox)
 
-class FormLineEdit(QLineEdit):
+      leftGroupBox = QGroupBox()
+      leftformlayout = QFormLayout()
+      # leftformlayout.setContentsMargins(0,0,0,0)
+      leftGroupBox.setLayout(leftformlayout)
+      hbox.addWidget(leftGroupBox)
+
+      rightGroupBox = QGroupBox()
+      rightformlayout = QFormLayout()
+      # rightformlayout.setContentsMargins(0,0,0,0)
+      rightGroupBox.setLayout(rightformlayout)
+      hbox.addWidget(rightGroupBox)
+
+      # headers
+      self.headerOdd = QLineEdit(str(ds['ho']))
+      topformlayout.addRow(QLabel("Header odd:"), self.headerOdd)
+      self.headerEven = QLineEdit(str(ds['he']))
+      topformlayout.addRow(QLabel("Header even:"), self.headerEven)
+
+      self.np = NumLineEdit(str(ds['np']),3,True)
+      leftformlayout.addRow(QLabel("Numbers of Pages:"), self.np)
+      #
+      leftformlayout.addRow(Line(self))
+      #
+      self.pw = NumLineEdit(str(ds['pw']))
+      leftformlayout.addRow(QLabel("Page Width (mm):"), self.pw)
+      self.ph = NumLineEdit(str(ds['ph']))
+      leftformlayout.addRow(QLabel("Page Height (mm):"), self.ph)
+      #
+      leftformlayout.addRow(Line(self))
+      #
+      self.mt = NumLineEdit(str(ds['mt']),3)
+      leftformlayout.addRow(QLabel("Margin Top (mm):"), self.mt)
+      self.mb = NumLineEdit(str(ds['mb']),3)
+      leftformlayout.addRow(QLabel("Margin Bottom (mm):"), self.mb)
+      self.mi = NumLineEdit(str(ds['mi']),3)
+      leftformlayout.addRow(QLabel("Margin inner (mm):"), self.mi)
+      self.me = NumLineEdit(str(ds['me']),3)
+      leftformlayout.addRow(QLabel("Margin external (mm):"), self.me)
+
+      #
+      self.cs = NumLineEdit(str(ds['cs']),3)
+      rightformlayout.addRow(QLabel("Crop size (mm):"), self.cs)
+      self.bs = NumLineEdit(str(ds['bs']),3)
+      rightformlayout.addRow(QLabel("Bleed size (mm):"), self.bs)
+      #
+      rightformlayout.addRow(Line(self))
+      #
+      self.cn = NumLineEdit(str(ds['cn']),2,True)
+      rightformlayout.addRow(QLabel("Columns number:"), self.cn)
+      self.cg = NumLineEdit(str(ds['cg']),2)
+      rightformlayout.addRow(QLabel("Columns gutters:"), self.cg)
+      #
+      self.rn = NumLineEdit(str(ds['rn']),2,True)
+      rightformlayout.addRow(QLabel("Rows number:"), self.rn)
+      self.rg = NumLineEdit(str(ds['rg']),2)
+      rightformlayout.addRow(QLabel("Rows gutters:"), self.rg)
+      #
+      rightformlayout.addRow(Line(self))
+      #
+      self.lh = NumLineEdit(str(ds['lh']),2,True)
+      rightformlayout.addRow(QLabel("Line height:"), self.lh)
+
+      # self.formGroupBox.setLayout(layout)
+
+class NumLineEdit(QLineEdit):
    def __init__(self, parent, ml=5, int=False, mw=60):
-      super(FormLineEdit, self).__init__(parent)
+      super(NumLineEdit, self).__init__(parent)
       self.setFixedWidth(mw)
       self.setMaxLength(ml)
       if int:

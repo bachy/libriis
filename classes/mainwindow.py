@@ -202,6 +202,8 @@ class MainWindow(QMainWindow):
       d = docsetdialog.DocsetDialog(self)
       d.exec_()
       self.core.recordDocSettings({
+         "ho":d.headerOdd.text(),
+         "he":d.headerEven.text(),
          "np":d.np.text(),
          "pw":d.pw.text(),
          "ph":d.ph.text(),

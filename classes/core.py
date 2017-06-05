@@ -152,7 +152,16 @@ class Core():
          r'\$row-number:\s[0-9|\.]+;',
          '$row-number: '+self.docsettings['rn']+';',
          sass)
-      #
+      #$header-odd: "Cascade, default header";
+      sass = re.sub(
+         r'\$header-odd:\s".+";',
+         '$header-odd: "'+self.docsettings['ho']+'";',
+         sass)
+      # $header-even: "Cascade, default header";
+      sass = re.sub(
+         r'\$header-even:\s".+";',
+         '$header-even: "'+self.docsettings['he']+'";',
+         sass)
 
       # print('sass', sass)
       open(sassfilepath,"w").write(sass)
@@ -200,11 +209,12 @@ class Core():
       shutil.copytree(os.path.join(self.appcwd,'templates/newproject'), cwd)
       self.changeCWD(cwd)
       self.loadDocSettings()
-      # self.docsettings = json.loads(open(os.path.join(cwd,'.config/docsettings.json')).read())
       self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
-      self.repository = git.Repo.init(cwd)
-      self.repository.index.add(['assets','contents','.config'])
-      self.repository.index.commit("initial commit")
+      # self.repository = git.Repo.init(cwd)
+      # TODO: set git config user.name & user.email
+      # self.repository
+      # self.repository.index.add(['assets','contents','.config'])
+      # self.repository.index.commit("initial commit")
 
 
    def saveproject(self, cwd = None):
