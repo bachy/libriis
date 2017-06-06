@@ -179,7 +179,7 @@ class WebViewToolBar(QWidget):
       self.hbox.addWidget(self.zoom)
 
       # page
-      self.gotopage = QLabel("Go to Page: /"+self.parent.core.docsettings['np'])
+      self.gotopage = QLabel("Go to Page: /"+str(self.parent.core.docsettings['np']))
       self.hbox.addWidget(self.gotopage)
       self.page = QSpinBox(self)
       self.page.setMinimum(1)

@@ -33,6 +33,7 @@ class Core():
       self._mw = False
       self.temp = tempfile.mkdtemp()
       # print(self.temp)
+      self.projectname = "Cascade"
 
       self.tempcwd = False
       # if ther's not current project folder from restorepref
