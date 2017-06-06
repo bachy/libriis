@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter
 
 from classes import highlighter
 
-import markdown2
+import markdown
 import json
 
 
@@ -247,8 +247,8 @@ class MarkdownEditor(QWidget):
          # self.tabs.setTabText(i, "* "+self.tabs.tabText(i))
 
    def refreshViewer(self):
-      markdown = self.editor.toPlainText()
-      html = markdown2.markdown(markdown)
+      md = self.editor.toPlainText()
+      html = markdown.markdown(md)
       self.viewer.setHtml(html)
 
    def save(self):

@@ -14,7 +14,8 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings, QCoreApplication
 
 import json
-import git
+# import git
+# from pygit2 import Repository
 
 from classes import server, sasscompiler, md2html
 
@@ -210,6 +211,7 @@ class Core():
       self.changeCWD(cwd)
       self.loadDocSettings()
       self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
+      # TODO: try python-pygit2 arch package
       # self.repository = git.Repo.init(cwd)
       # TODO: set git config user.name & user.email
       # self.repository
