@@ -1,0 +1,2 @@
+recursive-include cascade/assets *
+recursive-include cascade/templates *
