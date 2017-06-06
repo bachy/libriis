@@ -8,7 +8,7 @@
 # @Last modified time: 03-06-2017
 # @License: GPL-V3
 
-import sys
+import sys, os
 from PyQt5.QtWidgets import QApplication
 
 from classes import core, mainwindow
@@ -17,7 +17,8 @@ def main():
    app = QApplication(sys.argv)
    app.setOrganizationName('figli')
    app.setApplicationName('Cascade')
-   mainappcore = core.Core()
+   app.path = os.path.dirname(os.path.abspath(__file__))
+   mainappcore = core.Core(app.path)
    mainappwindow = mainwindow.MainWindow(mainappcore)
    mainappcore.mainwindow = mainappwindow
    sys.exit(app.exec_())

@@ -25,9 +25,9 @@ from classes import server, sasscompiler, md2html
 # / /___/ /_/ / /  /  __/
 # \____/\____/_/   \___/
 class Core():
-   def __init__(self, parent=None):
+   def __init__(self, apppath):
       # restore previous preferences
-      self.appcwd = os.getcwd()
+      self.appcwd = apppath
 
       self.restorePreferences()
       self._mw = False
