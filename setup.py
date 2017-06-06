@@ -1,14 +1,14 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
    name="Cascade",
    version="0.0.1",
-   # packages=find_packages(),
+
    packages=[
       'cascade',
       'cascade.classes',
    ],
-   # scripts=['cascade/main']
+
    include_package_data=True,
    package_data={
       # If any package contains *.txt or *.rst files, include them:
@@ -29,5 +29,7 @@ setup(
    entry_points={
       'gui_scripts': [ 'cascade = cascade.main:__main__', ]
    },
-   # install_requires=['setuptools-git']
+   install_requires=[
+      'pyphen','sass',
+   ],
 )

@@ -2,3 +2,4 @@ assets/scss/*.css
 __pycache__
 build
 Cascade.egg-info
+.eggs
