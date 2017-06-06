@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(
-   name="Cascade",
-   version="0.0.1",
+   name="cascade",
+   version="0.1",
 
    packages=[
       'cascade',
