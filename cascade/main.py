@@ -8,8 +8,7 @@
 # @Last modified time: 03-06-2017
 # @License: GPL-V3
 
-# from __future__ import absolute_import, print_function, unicode_literals
-from __future__ import division, absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, division, unicode_literals
 
 import sys, os
 from PyQt5.QtWidgets import QApplication

@@ -11,8 +11,10 @@
 
 # based on code from :
 # Copyright (C) 2008 Christophe Kibleur <kib2@free.fr>
-
 # TODO : see pyQode for more features https://github.com/pyQode
+
+from __future__ import absolute_import, print_function, division, unicode_literals
+
 
 import sys
 import re

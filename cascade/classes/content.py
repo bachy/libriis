@@ -9,12 +9,16 @@
 # @Last modified time: 03-06-2017
 # @License: GPL-V3
 
+from __future__ import absolute_import, print_function, division, unicode_literals
+
 import os, re
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter, QListWidget, QListWidgetItem, QAbstractItemView, QPushButton, QInputDialog, QPlainTextEdit, QTextEdit, QShortcut
+from PyQt5.QtWidgets import (QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSplitter,
+   QListWidget, QListWidgetItem, QAbstractItemView, QPushButton, QInputDialog,
+   QPlainTextEdit, QTextEdit, QShortcut)
 
 from . import highlighter
 
