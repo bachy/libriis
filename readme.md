@@ -1,14 +1,17 @@
 # Libriis
 
-![icon](assets/images/icon.png)
+![icon](libriis/assets/images/icon.png)
 
 A Markup Cascading Styles Printing software.
 
 ## Design Stack
-![Design Stack](assets/images/Screenshot_stackdesign.png)
+
+![Design Stack](libriis/assets/images/Screenshot_stackdesign.png)
 
 ## Contents Stack
-![Contents Stack](assets/images/Screenshot_stackcontents.png)
+
+![Contents Stack](libriis/assets/images/Screenshot_stackcontents.png)
 
 ## Mockups
-![mockups](assets/images/mockups.png)
+
+![mockups](libriis/assets/images/mockups.png)
