@@ -1,2 +1,3 @@
 sass
 pyphen
+pygments-style-github
