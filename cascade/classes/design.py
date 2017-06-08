@@ -19,7 +19,7 @@ from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
 
-from classes import highlighter
+from . import highlighter
 
 
 #  _       __     __  _    ___

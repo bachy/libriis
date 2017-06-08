@@ -3,13 +3,12 @@
 """Cascade: The html2print GUI
 """
 
-# from __future__ import division, absolute_import, unicode_literals
-# import os
+from __future__ import absolute_import
 import sys
 
 
 __copyright__ = """
-Copyright (C) 2007-2016 Bachir Soussi Chiadmi and contributors
+Copyright (C) 2007-2016 Bachir Soussi Chiadmi
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the A GNU General Public License version 2 as
@@ -21,34 +20,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 """
-
-
-# def setup_environment():
-#     """Provides access to the cascade modules"""
-#     abspath = os.path.abspath
-#     dirname = os.path.dirname
-#     join = os.path.join
-#     realpath = os.path.realpath
-#
-#     # Try to detect where it is run from and set prefix and the search path.
-#     # It is assumed that the user installed Cola using the --prefix= option
-#     python2 = sys.version_info[0] == 2
-#     prefix = dirname(dirname(realpath(abspath(__file__))))
-#     if python2:
-#         cola_mod = join(prefix, str('cola'), str('__init__.py'))
-#         install_lib = join(prefix, str('share'), str('git-cola'), str('lib'))
-#     else:
-#         # Look for modules in the source or install trees
-#         cola_mod = join(prefix, 'cola', '__init__.py')
-#         install_lib = join(prefix, 'share', 'git-cola', 'lib')
-#
-#     if os.path.exists(cola_mod):
-#         # Source tree
-#         sys.path.insert(1, prefix)
-#     else:
-#         # Install tree
-#         sys.path.insert(1, install_lib)
-# setup_environment()
 
 from cascade.main import main  # pylint: disable=wrong-import-position
 

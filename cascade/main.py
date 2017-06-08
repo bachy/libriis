@@ -8,10 +8,13 @@
 # @Last modified time: 03-06-2017
 # @License: GPL-V3
 
+# from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import division, absolute_import, unicode_literals
+
 import sys, os
 from PyQt5.QtWidgets import QApplication
 
-from classes import core, mainwindow
+from .classes import (core, mainwindow)
 
 def main():
    app = QApplication(sys.argv)
@@ -23,5 +26,5 @@ def main():
    mainappcore.mainwindow = mainappwindow
    sys.exit(app.exec_())
 
-if __name__ == "__main__":
-   main()
+# if __name__ == "__main__":
+#    main()

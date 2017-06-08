@@ -17,7 +17,7 @@ import json
 # import git
 # from pygit2 import Repository
 
-from classes import server, sasscompiler, md2html
+from . import server, sasscompiler, md2html
 
 #    ______
 #   / ____/___  ________

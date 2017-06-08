@@ -13,7 +13,7 @@ import os
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QLabel, QStackedWidget, QFileDialog, QMessageBox
 
-from classes import design, content, docsetdialog
+from . import design, content, docsetdialog
 
 
 
