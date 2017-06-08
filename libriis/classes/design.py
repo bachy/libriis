@@ -61,7 +61,7 @@ class WebkitView(QWebView):
       self.printer.setPaperSize(QSizeF(210, 300), QPrinter.Millimeter)
       # self.printer.setOrientation(QPrinter.Portrait)
       self.printer.setOutputFormat(QPrinter.PdfFormat)
-      self.printer.setCreator('Cascade')
+      self.printer.setCreator('Libriis')
       self.printer.setDocName(self.core.projectname)
       self.printer.setOutputFileName(self.core.projectname+".pdf")
       # self.setFixedWidth(1000)
@@ -282,13 +282,13 @@ class WebViewToolBar(QWidget):
 
    def recToolbarState(self, prop, val):
       # print('recToolbarState : '+prop, val)
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       settings.setValue('design/toolbar/'+prop, val)
       # print('recToolbarState after : '+prop, settings.value('design/toolbar/'+prop))
 
    def onRefresh(self):
       # apply precedent toolbar state
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       self.preview.setChecked(bool(settings.value('design/toolbar/preview', False, type=bool)))
       self.debug.setChecked(bool(settings.value('design/toolbar/debug', False, type=bool)))
       self.grid.setChecked(bool(settings.value('design/toolbar/grid', False, type=bool)))
@@ -469,7 +469,7 @@ class DesignStack(QWidget):
 
 
    def restorePrefs(self):
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       print(settings.value('design/vsplitter/sizes', self.vsplitter.sizes()))
       vals = settings.value('design/vsplitter/sizes', None)
       if vals:
@@ -484,7 +484,7 @@ class DesignStack(QWidget):
          self.hsplitter.setSizes(sizes)
 
    def movedSplitter(self):
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       # print(self.vsplitter.sizes())
       settings.setValue('design/vsplitter/sizes', self.vsplitter.sizes())
       settings.setValue('design/hsplitter/sizes', self.hsplitter.sizes())

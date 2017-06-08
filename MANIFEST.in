@@ -1,2 +1,2 @@
-recursive-include cascade/assets *
-recursive-include cascade/templates *
+recursive-include libriis/assets *
+recursive-include libriis/templates *

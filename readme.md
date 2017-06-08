@@ -1,8 +1,8 @@
-# Cascade
+# Libriis
 
 ![icon](assets/images/icon.png)
 
-A Markup Cascading Printing software
+A Markup Cascading Styles Printing software.
 
 ## Design Stack
 ![Design Stack](assets/images/Screenshot_stackdesign.png)

@@ -295,7 +295,7 @@ class ContentStack(QWidget):
 
 
    def restorePrefs(self):
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       vals = settings.value('content/hsplitter/sizes', None)
       if vals:
          sizes = []
@@ -303,7 +303,7 @@ class ContentStack(QWidget):
          self.hsplitter.setSizes(sizes)
 
    def movedSplitter(self):
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       # print(self.hsplitter.sizes())
       settings.setValue('content/hsplitter/sizes', self.hsplitter.sizes())
 

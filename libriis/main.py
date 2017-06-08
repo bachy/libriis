@@ -17,8 +17,8 @@ from .classes import (core, mainwindow)
 
 def main():
    app = QApplication(sys.argv)
-   app.setOrganizationName('figli')
-   app.setApplicationName('Cascade')
+   app.setOrganizationName('Figureslibres')
+   app.setApplicationName('Libriis')
    app.path = os.path.dirname(os.path.abspath(__file__))
    mainappcore = core.Core(app.path)
    mainappwindow = mainwindow.MainWindow(mainappcore)

@@ -1,42 +1,35 @@
 from setuptools import setup
 
 setup(
-   name="cascade",
+   name="libriis",
    version="0.1",
-
+   author = "Bachir Soussi Chiadmi",
+   author_email = "bach@figureslibres.io",
    packages=[
-      'cascade',
-      'cascade.classes',
+      'libriis',
+      'libriis.classes',
    ],
-
    scripts = [
-      'bin/cascade',
+      'bin/libriis',
    ],
-
-
    include_package_data=True,
    package_data={
       # If any package contains *.txt or *.rst files, include them:
       '': ['*.png', '*.html', '*.zip', '*.scss', '*.js', '*.md'],
-      '': ['cascade.assets','cascade.assets.images'],
+      '': ['libriis.assets','libriis.assets.images'],
       '': [
-            'cascade.templates',
-            'cascade.templates.newproject',
-            'cascade.templates.newproject..config',
-            'cascade.templates.newproject.assets',
-            'cascade.templates.newproject.assets.css',
-            'cascade.templates.newproject.assets.images',
-            'cascade.templates.newproject.assets.js',
-            'cascade.templates.newproject.assets.lib',
-            'cascade.templates.newproject.contents'
+            'libriis.templates',
+            'libriis.templates.newproject',
+            'libriis.templates.newproject..config',
+            'libriis.templates.newproject.assets',
+            'libriis.templates.newproject.assets.css',
+            'libriis.templates.newproject.assets.images',
+            'libriis.templates.newproject.assets.js',
+            'libriis.templates.newproject.assets.lib',
+            'libriis.templates.newproject.contents'
          ]
    },
-   # TODO: entry point is not working
-   # entry_points={
-   #    'gui_scripts': [ 'cascade = cascade.main:__main__', ]
-   # },
-   # TODO: dependencies are not installed :(
-   # install_requires=[
-   #    'pyphen','sass',
-   # ],
+   install_requires=[
+      'pyphen','sass',
+   ],
 )

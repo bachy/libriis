@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
       # load core class
       self.core = core
 
-      self.setWindowTitle("Cascade")
+      self.setWindowTitle("Libriis")
       self.setWindowIcon(QIcon(os.path.join(self.core.appcwd,'assets/images/icon.png')))
 
       self.resize(self.core.mw_size)
@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
       try:
          head, tail = os.path.split(folder)
          self.core.dialog_path = head
-         # TODO: check if is cascade folder
+         # TODO: check if is libriis folder
          print(folder)
          if os.path.isdir(folder):
             self.core.openproject(folder)
@@ -171,7 +171,7 @@ class MainWindow(QMainWindow):
             self.core.initnewproject(projectname)
          else:
             print("folder already exists")
-            # TODO: check if is cascade folder
+            # TODO: check if is libriis folder
       except Exception as e:
          print('Exception', e)
          pass
@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
                self.quit()
          else:
             print("folder already exists")
-            # TODO: check if is cascade folder
+            # TODO: check if is libriis folder
       except Exception as e:
          print('Exception', e)
          pass

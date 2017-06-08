@@ -35,7 +35,7 @@ class Core():
       self._mw = False
       self.temp = tempfile.mkdtemp()
       # print(self.temp)
-      self.projectname = "Cascade"
+      self.projectname = "Libriis"
 
       self.tempcwd = False
       # if ther's not current project folder from restorepref
@@ -68,7 +68,7 @@ class Core():
       if not self._mw:
          self._mw = mw
          if not self.tempcwd:
-            self._mw.setWindowTitle("Cascade – "+self.cwd)
+            self._mw.setWindowTitle("Libriis – "+self.cwd)
 
    #     ____            ____
    #    / __ \________  / __/____
@@ -77,7 +77,7 @@ class Core():
    # /_/   /_/   \___/_/ /____/
    def restorePreferences(self):
       # print("restorePreferences")
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       # settings.clear()
       # print(settings.allKeys())
 
@@ -90,7 +90,7 @@ class Core():
 
    def savePreferences(self):
       # print("savePreferences")
-      settings = QSettings('FiguresLibres', 'Cascade')
+      settings = QSettings('FiguresLibres', 'Libriis')
       # print(settings.allKeys())
 
       if not self.tempcwd:
@@ -156,12 +156,12 @@ class Core():
          r'\$row-number:\s[0-9|\.]+;',
          '$row-number: '+self.docsettings['rn']+';',
          sass)
-      #$header-odd: "Cascade, default header";
+      #$header-odd: "Libriis, default header";
       sass = re.sub(
          r'\$header-odd:\s".+";',
          '$header-odd: "'+self.docsettings['ho']+'";',
          sass)
-      # $header-even: "Cascade, default header";
+      # $header-even: "Libriis, default header";
       sass = re.sub(
          r'\$header-even:\s".+";',
          '$header-even: "'+self.docsettings['he']+'";',
@@ -246,7 +246,7 @@ class Core():
          self.contentcompiler.reload()
 
       if not self.tempcwd:
-         self._mw.setWindowTitle("Cascade – "+self.cwd)
+         self._mw.setWindowTitle("Libriis – "+self.cwd)
          head, tail = os.path.split(self.cwd)
          print('tail', projectname)
          self.projectname = tail

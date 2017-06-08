@@ -1,8 +1,8 @@
 {
-  "git.user.name":"Cascade",
-  "git.user.email":"cascade@figureslibres.io",
-	"ho": "Cascade, default header odd",
-	"he": "Cascade, default header even",
+  "git.user.name":"libriis",
+  "git.user.email":"libriis@figureslibres.io",
+	"ho": "Libriis, default header odd",
+	"he": "Libriis, default header even",
   "np": 1,
   "pw": 210,
   "ph": 297,
