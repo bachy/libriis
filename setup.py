@@ -9,6 +9,11 @@ setup(
       'cascade.classes',
    ],
 
+   scripts = [
+      'bin/cascade',
+   ],
+
+
    include_package_data=True,
    package_data={
       # If any package contains *.txt or *.rst files, include them:
@@ -26,10 +31,12 @@ setup(
             'cascade.templates.newproject.contents'
          ]
    },
-   entry_points={
-      'gui_scripts': [ 'cascade = cascade.main:__main__', ]
-   },
-   install_requires=[
-      'pyphen','sass',
-   ],
+   # TODO: entry point is not working
+   # entry_points={
+   #    'gui_scripts': [ 'cascade = cascade.main:__main__', ]
+   # },
+   # TODO: dependencies are not installed :(
+   # install_requires=[
+   #    'pyphen','sass',
+   # ],
 )
