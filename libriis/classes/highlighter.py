@@ -82,15 +82,15 @@ class Highlighter(QSyntaxHighlighter):
    def __init__(self, parent, mode):
       QSyntaxHighlighter.__init__(self, parent)
 
-      # styles = list(get_all_styles())
-      # print(styles)
+      styles = list(get_all_styles())
+      print(styles)
 
       # Keep the formatter and lexer, initializing them
       # may be costly.
       if not mode == "md":
          self.formatter=QFormatter(linenos=True, style="monokai")
       else:
-         self.formatter=QFormatter(linenos=False, style="github")
+         self.formatter=QFormatter(linenos=False, style="default")
 
       self.lexer=get_lexer_by_name(mode)
 
