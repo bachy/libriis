@@ -16,7 +16,10 @@ import os, re
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, QSettings, QSizeF, Qt
 from PyQt5.QtGui import QKeySequence, QFont
-from PyQt5.QtWidgets import QWidget, QTabWidget, QVBoxLayout, QHBoxLayout, QSplitter, QPlainTextEdit, QShortcut, QPushButton, QCheckBox, QSpinBox, QLabel
+from PyQt5.QtWidgets import (QWidget, QTabWidget,
+                              QVBoxLayout, QHBoxLayout, QSplitter,
+                              QPlainTextEdit, QShortcut,
+                              QPushButton, QCheckBox, QSpinBox, QLabel)
 from PyQt5.QtWebKit import QWebSettings
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
@@ -316,6 +319,7 @@ class CodeEditor(QPlainTextEdit):
       self.tabs = tabs
       self.file = file
       self.hl= highlighter.Highlighter(self.document(),mode)
+      # TODO: set code editor background color to dark
       self.setText()
       self.setTabStopWidth(15)
 

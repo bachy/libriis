@@ -10,13 +10,15 @@
 
 from __future__ import absolute_import, print_function, division, unicode_literals
 
-import os
+import os, asyncio
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QAction, QWidget, QLabel, QStackedWidget, QFileDialog, QMessageBox
-
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon, QKeySequence
+from PyQt5.QtWidgets import (QMainWindow, QAction, QWidget,
+                              QLabel, QStackedWidget,
+                              QFileDialog, QMessageBox,
+                              QShortcut)
 from . import design, content, docsetdialog
-
 
 
 class MainWindow(QMainWindow):
@@ -250,6 +252,45 @@ class MainWindow(QMainWindow):
          self.mainstack.setCurrentIndex(1)
       elif q.text() == "&Version":
          self.mainstack.setCurrentIndex(2)
+
+   #     __              ____                      ______                 __
+   #    / /_____  __  __/ __ \________  __________/ ____/   _____  ____  / /_
+   #   / //_/ _ \/ / / / /_/ / ___/ _ \/ ___/ ___/ __/ | | / / _ \/ __ \/ __/
+   #  / ,< /  __/ /_/ / ____/ /  /  __(__  |__  ) /___ | |/ /  __/ / / / /_
+   # /_/|_|\___/\__, /_/   /_/   \___/____/____/_____/ |___/\___/_/ /_/\__/
+   #           /____/
+   # def keyPressEvent(self, e):
+   #    print('keyPressEvent', e.key())
+   #    # print('Qt.Key_Alt', Qt.Key_Alt)
+   #    super(MainWindow, self).keyPressEvent(e)
+   #    self.checkToggleMenu('pressed', e.key() == Qt.Key_Alt)
+   #
+   # def keyReleaseEvent(self, e):
+   #    print('keyReleaseEvent', e.key())
+   #    # print('Qt.Key_Alt', Qt.Key_Alt)
+   #    super(MainWindow, self).keyReleaseEvent(e)
+   #    self.checkToggleMenu('released', e.key() == Qt.Key_Alt)
+
+   # def checkToggleMenu(self, act='released', alt=True):
+   #    print("-- -- checkToggleMenu : "+act+" | alt :"+str(alt))
+   #    # if alt is pressed, other key pressevent is not fired, only release :(
+   #    # keyPressEvent is waiting for toggleMenu o_O which is supposed to be asynchro ...
+   #    if not alt:
+   #       self.key_pressed_after_alt = True
+   #    if alt and act=="pressed":
+   #       self.key_pressed_after_alt = False
+   #    if act == 'released' and alt:
+   #       loop = asyncio.get_event_loop()
+   #       loop.run_until_complete(self.toggleMenu())
+   #       # loop.close()
+
+   # async def toggleMenu(self):
+   #    print('toggleMenu')
+   #    await asyncio.sleep(2)
+   #    if not self.key_pressed_after_alt:
+   #       print('!! !! TOGGLE !! !!')
+   #       # self.menuBar().setVisible(not self.menuBar().isVisible())
+
 
    #     __  ___      _      _____ __             __
    #    /  |/  /___ _(_)___ / ___// /_____ ______/ /__
