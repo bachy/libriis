@@ -318,8 +318,8 @@ class CodeEditor(QPlainTextEdit):
       self.core = core
       self.tabs = tabs
       self.file = file
-      self.hl= highlighter.Highlighter(self.document(),mode)
-      # TODO: set code editor background color to dark
+      self.mode = mode
+      self.setStyle()
       self.setText()
       self.setTabStopWidth(15)
 
@@ -327,6 +327,18 @@ class CodeEditor(QPlainTextEdit):
 
       self.save_shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
       self.save_shortcut.activated.connect(self.save)
+
+   def setStyle(self):
+      font = QFont()
+      font.setFamily("Droid Sans Mono")
+      font.setFixedPitch(True)
+      font.setPointSize(12)
+      self.setFont(font)
+
+      self.hl= highlighter.Highlighter(self.document(),self.mode)
+
+      self.setStyleSheet("QPlainTextEdit { background-color: #282828; }")
+
 
    def setText(self):
       # try:
@@ -338,12 +350,6 @@ class CodeEditor(QPlainTextEdit):
       self.clear()
       self.insertPlainText(open(self.filepath, 'r').read())
       self.changed = False
-
-      font = QFont()
-      font.setFamily("Droid Sans Mono")
-      font.setFixedPitch(True)
-      font.setPointSize(12)
-      self.setFont(font)
 
 
    def onTextChanged(self):
