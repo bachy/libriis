@@ -21,7 +21,7 @@ GNU General Public License for more details.
 
 """
 
-from libriis.main import main  # pylint: disable=wrong-import-position
+from libriis.main import main
 
 if __name__ == '__main__':
     sys.exit(main())

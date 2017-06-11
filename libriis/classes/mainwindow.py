@@ -48,6 +48,8 @@ class MainWindow(QMainWindow):
    def initMenuBar(self):
       # menu bar
       bar = self.menuBar()
+      # bar.setNativeMenuBar(False)
+
       file = bar.addMenu("&File")
 
       new = QAction("&New Project",self)
@@ -57,10 +59,6 @@ class MainWindow(QMainWindow):
       open = QAction("&Open",self)
       open.setShortcut("Ctrl+o")
       file.addAction(open)
-
-      self.save_action = QAction("&Save Project as",self)
-      self.save_action.setShortcut("Ctrl+Shift+s")
-      file.addAction(self.save_action)
 
       self.save_action = QAction("&Save Project as",self)
       self.save_action.setShortcut("Ctrl+Shift+s")
@@ -98,23 +96,37 @@ class MainWindow(QMainWindow):
       # view menu
       view = bar.addMenu("&View")
 
-      designview = QAction("&Design",self)
-      designview.setShortcut("F1")
-      view.addAction(designview)
-
       contentview = QAction("&Content",self)
-      contentview.setShortcut("F2")
+      contentview.setShortcut("F1")
       view.addAction(contentview)
 
-      versionview = QAction("&Version",self)
+      designview = QAction("&Design",self)
+      designview.setShortcut("F2")
+      view.addAction(designview)
+
+      versionview = QAction("&Version")
       versionview.setShortcut("F3")
       view.addAction(versionview)
 
+      self.menuview = QAction("&Show Menu", self)
+      self.menuview.setCheckable(True)
+      self.menuview.setShortcutContext(Qt.ApplicationShortcut)
+      self.menuview.setShortcut('F4')
+      view.addAction(self.menuview)
+
+
+      # self.menuview_shortcut = QShortcut(QKeySequence("F4"), self)
+      # self.menuview_shortcut.activated.connect(self.toggleMenu)
+
       view.triggered[QAction].connect(self.onviewmenutrigger)
+
 
       # about menu
       about = bar.addMenu("About")
       about.addAction("&Website")
+
+      self.menuisvisible = True
+      # TODO: get menu visibility from settings
 
    def onfilemenutrigger(self, q):
       print(q.text()+" is triggered")
@@ -186,6 +198,7 @@ class MainWindow(QMainWindow):
          self,
          'Save Project',
          self.core.dialog_path
+         # TODO: if tempproject open in home
       )[0]
       # TODO: no file type
       try:
@@ -246,12 +259,34 @@ class MainWindow(QMainWindow):
 
    def onviewmenutrigger(self, q):
       print(q.text()+" is triggered")
-      if q.text() == "&Design":
+      if q.text() == "&Content":
          self.mainstack.setCurrentIndex(0)
-      elif q.text() == "&Content":
+      elif q.text() == "&Design":
          self.mainstack.setCurrentIndex(1)
       elif q.text() == "&Version":
          self.mainstack.setCurrentIndex(2)
+      elif q.text() == "&Show Menu":
+         self.toggleMenu()
+
+   def toggleMenu(self):
+      self.menuisvisible = not self.menuisvisible
+      if self.menuisvisible:
+         print('show menu')
+         # self.menuBar().adjustSize()
+         # self.menuBar().show()
+         # .height(1)
+         #setVisible(True)
+         # .setStyleSheet("margin-top:0;")
+         self.menuview.setChecked(True)
+      else:
+         print('hide menu')
+         # self.menuBar()
+         # self.menuBar().hide()
+         # .height(25)
+         #setVisible(False)
+         # .setStyleSheet("margin-top:-10px;")
+         self.menuview.setChecked(False)
+
 
    #     __              ____                      ______                 __
    #    / /_____  __  __/ __ \________  __________/ ____/   _____  ____  / /_
@@ -300,12 +335,12 @@ class MainWindow(QMainWindow):
    def initMainStack(self):
       self.mainstack = QStackedWidget()
 
-      self.designstack = design.DesignStack(self.core)
       self.contentstack = content.ContentStack(self.core)
+      self.designstack = design.DesignStack(self.core)
       self.versionstack = QLabel("Version (git).")
 
-      self.mainstack.addWidget(self.designstack)
       self.mainstack.addWidget(self.contentstack)
+      self.mainstack.addWidget(self.designstack)
       self.mainstack.addWidget(self.versionstack)
 
       self.mainstack.setCurrentIndex(self.core.mw_curstack)

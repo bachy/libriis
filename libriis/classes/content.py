@@ -147,6 +147,7 @@ class SummaryListWidgetItem(QListWidgetItem):
 
       self.setText(data['title'])
       self.setToolTip(data['file'])
+      # self.setStyleSheet('padding:5px;')
 
 class SummaryActions(QWidget):
    def __init__(self,parent):

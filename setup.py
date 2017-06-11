@@ -1,5 +1,8 @@
 from setuptools import setup
 
+# TODO: addd a makefile to compile our own qt5-webkit lib
+# see aur package qt5-webkit-print for options andd build
+
 setup(
    name="libriis",
    version="0.1",

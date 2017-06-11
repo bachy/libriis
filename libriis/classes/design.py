@@ -12,7 +12,7 @@
 from __future__ import absolute_import, print_function, division, unicode_literals
 
 import os, re
-# sys,
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QUrl, QSettings, QSizeF, Qt
 from PyQt5.QtGui import QKeySequence, QFont
@@ -21,7 +21,12 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget,
                               QPlainTextEdit, QShortcut,
                               QPushButton, QCheckBox, QSpinBox, QLabel)
 from PyQt5.QtWebKit import QWebSettings
+
+# TODO import own custom build lib of QtWebKit with ctypes
+# see aur package qt5-webkit-print for options
+# https://stackoverflow.com/questions/5081875/ctypes-beginner
 from PyQt5.QtWebKitWidgets import QWebView, QWebInspector
+
 from PyQt5.QtPrintSupport import QPrintPreviewDialog, QPrinter
 
 from . import highlighter
@@ -53,15 +58,19 @@ class WebkitView(QWebView):
       self.parent.webviewtoolbar.onRefresh()
 
    def initPDF(self):
+      # from https://gist.github.com/gciotta/7766803
+
       self.printer = QPrinter(QPrinter.HighResolution)
       self.printer.setFullPage(True)
-      # self.printer.setPageMargins(0,0,0,0,QPrinter.Millimeter)
+      self.printer.setPageMargins(0,0,0,0,QPrinter.Millimeter)
       self.printer.setFontEmbeddingEnabled(True)
       self.printer.setColorMode(QPrinter.Color)
       # TODO: set the page size and orientation from doc settings
       # (need to do doc settings before that)
       # self.printer.setPageSize(QPrinter.A4)
-      self.printer.setPaperSize(QSizeF(210, 300), QPrinter.Millimeter)
+      # self.printer.setResolution(96)
+      self.printer.setPaperSize(QSizeF(210, 298), QPrinter.Millimeter)
+      # TODO: change paper size from docsettings
       # self.printer.setOrientation(QPrinter.Portrait)
       self.printer.setOutputFormat(QPrinter.PdfFormat)
       self.printer.setCreator('Libriis')
