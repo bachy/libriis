@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
       designview.setShortcut("F2")
       view.addAction(designview)
 
-      versionview = QAction("&Version")
+      versionview = QAction("&Version",self)
       versionview.setShortcut("F3")
       view.addAction(versionview)
 
