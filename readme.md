@@ -22,16 +22,6 @@ Libriis is developed with python and pyqt5, if you are confident with theese too
 
 !! following install code is not yet functional !!
 
-```shell
-pip install sass
-pip install pyphen
-git clone https://figureslibres.io/gogs/bachir/libriis.git
-cd libriis
-python setup.py install --optimize=1 -f
-```
-
- 
-
 ### Arch
 
 For Arch Linux and derivated distro, an aur package exists :
@@ -44,8 +34,20 @@ yaourt -S libriis-git
 
 install dependences
 ```
-qt5-base python python-pyqt5 python-markdown python-pygit2 python-beautifulsoup4 pandoc python-pypandoc python-pygments python-setuptools desktop-file-utils qt5-webkit-print
+apt-get install qt5-base pandoc python python-pyqt5 
+apt-get install python-markdown python-pygit2 python-beautifulsoup4 python-pypandoc python-pygments python-setuptools
 ```
+
+### Python
+
+```shell
+pip install sass
+pip install pyphen
+git clone https://figureslibres.io/gogs/bachir/libriis.git
+cd libriis
+python setup.py install --optimize=1 -f
+```
+
 
 
 ### qt-webkit
