@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+# -*- python-mode -*-
+"""Libriis: The html2print GUI
+"""
+
+from __future__ import absolute_import, print_function, division, unicode_literals
+import sys, os
+
+# print(os.environ['LD_LIBRARY_PATH'])
+
+__copyright__ = """
+Copyright (C) 2007-2016 Bachir Soussi Chiadmi
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the A GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+"""
+
+from libriis.main import main
+
+# sys.path.append('/usr/local/lib')
+# sys.path.append('/usr/local/lib64')
+
+if __name__ == '__main__':
+    sys.exit(main())

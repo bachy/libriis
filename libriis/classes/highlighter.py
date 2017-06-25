@@ -83,7 +83,7 @@ class Highlighter(QSyntaxHighlighter):
       QSyntaxHighlighter.__init__(self, parent)
 
       styles = list(get_all_styles())
-      print(styles)
+      # print(styles)
 
       # Keep the formatter and lexer, initializing them
       # may be costly.

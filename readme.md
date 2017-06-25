@@ -40,6 +40,12 @@ For Arch Linux and derivated distro, an aur package exists :
 yaourt -S libriis-git
 ```
 
+### Ubuntu
+
+install dependences
+```
+qt5-base python python-pyqt5 python-markdown python-pygit2 python-beautifulsoup4 pandoc python-pypandoc python-pygments python-setuptools desktop-file-utils qt5-webkit-print
+```
 
 
 ### qt-webkit
