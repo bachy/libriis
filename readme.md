@@ -24,18 +24,28 @@ Libriis is developed with python and pyqt5, if you are confident with theese too
 
 ### Arch
 
-For Arch Linux and derivated distro, an aur package exists :
+#### qt-webkit
+Under arch linux Libriis depends on a patched version of qtwebkit to render and print the pages:
+You can install it from the qt5-webkit-print-tp5 package: https://figureslibres.io/gogs/bachir/aur--qt5-webkit-print/releases 
+
+#### Libriis
+Once special dependance installed : 
+For Arch Linux and derivated distro, an aur package exists for Libriis :
 ``` 
 yaourt -S libriis-git
 ```
 
-### Ubuntu
 
-dependences
+### Ubuntu (not tested)
+#### qt-webkit
+you'll have to build qt-webkit from source : https://github.com/annulen/webkit/wiki/Building-QtWebKit-on-Linux
+ 
+#### dependences
 ```shell
 apt-get install qt5-base pandoc python3 python3-pyqt5 python3-pip 
 pip3 install sass markdown beautifulsoup4 pypandoc pygments setuptools pyphen
 ```
+#### Libriis
 clone
 ```shell
 git clone https://figureslibres.io/gogs/bachir/libriis.git
@@ -47,30 +57,12 @@ install
 python3 setup.py install --optimize=1 -f
 ```
 
-### qt-webkit
-
-for now, pdf export needs a custom build of qtwebkit, see [ospkit](http://osp.kitchen/tools/ospkit/)
-
-```shell
-sudo apt-get install build-essential perl python ruby flex gperf bison \
-cmake ninja-build libfontconfig1-dev libicu-dev libsqlite3-dev \
-zlib1g-dev libpng12-dev libjpeg-dev libxslt1-dev libxml2-dev libhyphen-dev
-
-git clone -b ospkit --single-branch https://github.com/aleray/webkit.git
-cd webkit
-WEBKIT_OUTPUTDIR=`pwd`/build/qt
-Tools/Scripts/build-webkit --qt --release --no-web-audio --no-video
-cd build/qt/Release
-sudo ninja install
-```
-
-
 
 ## Roadmap
 
-[] add git features
-[] handle pictures
-[] embed custom build of qtwebkit specialized in print (eg remove video)
+- [] add git features   
+- [] handle pictures   
+- [] embed custom build of qtwebkit specialized in print (eg remove video)
 
 
 
