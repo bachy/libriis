@@ -109,6 +109,7 @@ class Core():
    # /_____/\____/\___/   /____/\___/\__/\__/_/_/ /_/\__, /____/
    #                                                /____/
    def loadDocSettings(self):
+      print('loadDocSettings')
       self.docsettings = json.loads(open(os.path.join(self.cwd,'.config/docsettings.json')).read())
 
    def recordDocSettings(self,docsettings):
@@ -214,6 +215,7 @@ class Core():
       self.changeCWD(cwd)
       self.loadDocSettings()
       self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
+      print('summary', summary)
       # TODO: try python-pygit2 arch package
       # self.repository = git.Repo.init(cwd)
       # TODO: set git config user.name & user.email
@@ -239,6 +241,7 @@ class Core():
    # \___/_/ /_/\__,_/_/ /_/\__, /\___/\____/  |__/|__/_____/
    #                       /____/
    def changeCWD(self, cwd):
+      print('changeCWD :: cwd', cwd)
       if not cwd == self.cwd:
          self.cwd = cwd
          self.server.reload()
@@ -248,7 +251,7 @@ class Core():
       if not self.tempcwd:
          self._mw.setWindowTitle("Libriis – "+self.cwd)
          head, tail = os.path.split(self.cwd)
-         print('tail', projectname)
+         print('changeCWD :: tail', tail)
          self.projectname = tail
          self._mw.designstack.refresh()
          self._mw.contentstack.refresh()

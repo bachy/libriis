@@ -165,7 +165,7 @@ class MainWindow(QMainWindow):
          else:
             print("folder doesn't exists")
       except Exception as e:
-         print('Exception', e)
+         print('openprojectdialogue :: !!Exception!! :', e)
          pass
 
    def newprojectdialogue(self):
@@ -180,6 +180,9 @@ class MainWindow(QMainWindow):
       # TODO: no file type
       try:
          head, tail = os.path.split(projectname)
+         print('newprojectdialogue :: projectname', projectname)
+         print("newprojectdialogue :: head",head)
+         print("newprojectdialogue :: tail", tail)
          self.core.dialog_path = head
          if not os.path.isdir(projectname):
             self.core.initnewproject(projectname)
@@ -187,7 +190,7 @@ class MainWindow(QMainWindow):
             print("folder already exists")
             # TODO: check if is libriis folder
       except Exception as e:
-         print('Exception', e)
+         print('newprojectdialogue :: !!Exception!!', e)
          pass
 
    def saveprojectdialogue(self, quit=False):
