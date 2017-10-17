@@ -215,7 +215,7 @@ class Core():
       self.changeCWD(cwd)
       self.loadDocSettings()
       self.summary = json.loads(open(os.path.join(cwd,'.config/summary.json')).read())
-      print('summary', summary)
+      # print('summary', self.summary)
       # TODO: try python-pygit2 arch package
       # self.repository = git.Repo.init(cwd)
       # TODO: set git config user.name & user.email
