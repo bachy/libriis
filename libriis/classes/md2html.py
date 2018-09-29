@@ -90,27 +90,33 @@ class Compiler():
 
          pdoc_filters = []
 
+         # convert markdown from file to html
          output = pypandoc.convert_file(in_f,
                                to='html5',
                                format='markdown+smart+header_attributes+link_attributes+bracketed_spans',
                                extra_args=pdoc_args,
                                filters=pdoc_filters)
+         # print(output)
 
+         # convert html string to parseable html dom
          output_dom = BeautifulSoup(output, 'html.parser')
 
          # hyphenate paragraphes
-         for node in output_dom.find_all('p'):
-            self.hyphenate(node)
+         # for node in output_dom.find_all('p'):
+         #    self.hyphenate(node)
 
          # append html story page to template_dom
+         # create a page dom
          story_page = BeautifulSoup(
             '<div class="story-page story-page-'+str(pi)+'" id="'+pageid+'"></div>',
             'html.parser'
          )
+         # append to page dom the converted content
          story_page.div.append(output_dom)
+         # append to global dom content the page with contents
          story_dom.append(story_page)
 
-
+         # increment pahe index
          pi = pi+1
 
       # create main html file from filled template html dom
@@ -129,6 +135,7 @@ class Compiler():
       # print("hyphenate")
       nodetext = node.get_text()
       # print(nodetext)
+
       nodestr = str(node)
       # print(nodestr)
       for word in nodetext.split(' '):
