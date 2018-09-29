@@ -392,7 +392,7 @@ class Editor(QWidget):
       # Initialize tab screen
       self.tabs = QTabWidget()
 
-      self.scsstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/css/styles.scss', "sass")
+      self.scsstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/css/styles.scss', "scss")
       self.jstab = CodeEditor(self, self.parent.core, self.tabs, 'assets/js/script.js', 'js')
 
       # Add tabs

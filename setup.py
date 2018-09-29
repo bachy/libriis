@@ -33,6 +33,6 @@ setup(
          ]
    },
    install_requires=[
-      'pyphen','sass',
+      'pyphen','pyScss',
    ],
 )

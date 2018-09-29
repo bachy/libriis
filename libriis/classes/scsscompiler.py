@@ -4,7 +4,7 @@
 # @Author: Bachir Soussi Chiadmi <bach>
 # @Date:   30-05-2017
 # @Email:  bachir@figureslibres.io
-# @Filename: sasscompiler.py
+# @Filename: scsscompiler.py
 # @Last modified by:   bach
 # @Last modified time: 03-06-2017
 # @License: GPL-V3
@@ -13,7 +13,7 @@ from __future__ import absolute_import, print_function, division, unicode_litera
 
 import os
 from PyQt5.QtCore import QFileSystemWatcher
-import sass
+import scss
 
 class Compiler():
    def __init__(self,parent):
@@ -30,15 +30,20 @@ class Compiler():
       self.fs_watcher.fileChanged.connect(self.compile_scss)
 
    def compile_scss(self):
-      print("compiling sass")
+      print("compiling scss")
       try:
-         scss = sass.compile_file(str.encode(os.path.join(self.parent.cwd,'assets/css/main.scss')))
+         import_path = ['./assets/css/']
+         print("import path",import_path)
+         comp = scss.Compiler(output_style="compressed", search_path=import_path)
+         # Compiler().compile_string("a { color: red + green; }")
+         scss_file = open(os.path.join(self.parent.cwd,'assets/css/main.scss'),"r")
+         css = comp.compile_string(scss_file.read())
+         # print("css : %s" % css)
          with open(os.path.join(self.parent.cwd,'assets/css/main.css'), 'w') as fp:
-            fp.write(scss.decode('utf8'))
+            fp.write(css)
       except Exception as e:
-         print("Error compiling Sass", e)
+         print("Error compiling scss", e)
          pass
-
 
    def refreshPaths(self):
       self.paths = [
@@ -51,7 +56,7 @@ class Compiler():
             self.paths.append(os.path.join(self.parent.cwd,'assets/css',f))
 
    def reload(self):
-      print('Reload sass compiler')
+      print('Reload scss compiler')
       self.fs_watcher.removePaths(self.paths)
       self.refreshPaths()
       print('paths', self.paths)

@@ -19,7 +19,7 @@ import json
 # import git
 # from pygit2 import Repository
 
-from . import server, sasscompiler, md2html
+from . import server, scsscompiler, md2html
 
 #    ______
 #   / ____/___  ________
@@ -56,7 +56,7 @@ class Core():
 
    def initDeamons(self):
       self.server = server.Server(self)
-      self.sasscompiler = sasscompiler.Compiler(self)
+      self.scsscompiler = scsscompiler.Compiler(self)
       self.contentcompiler = md2html.Compiler(self)
 
    @property
@@ -125,9 +125,9 @@ class Core():
 
    def updateScss(self, reload=True):
       # print(self.docsettings)
-      sassfilepath = os.path.join(self.cwd,'assets/css/setup.scss')
-      # print(sassfilepath)
-      sass = open(sassfilepath,"r").read()
+      scssfilepath = os.path.join(self.cwd,'assets/css/setup.scss')
+      # print(scssfilepath)
+      scss = open(scssfilepath,"r").read()
       sets = {
          'pw':'page-width',
          'ph':'page-height',
@@ -142,34 +142,34 @@ class Core():
          'lh':'line-height'
       }
       for s in sets:
-         sass = re.sub(
+         scss = re.sub(
             r'\$'+sets[s]+':\smm2pt\([0-9|\.]+\);',
             '$'+sets[s]+': mm2pt('+self.docsettings[s]+');',
-            sass)
+            scss)
 
       # $col-number: 9;
-      sass = re.sub(
+      scss = re.sub(
          r'\$col-number:\s[0-9|\.]+;',
          '$col-number: '+self.docsettings['cn']+';',
-         sass)
+         scss)
       # $row-number: 12;
-      sass = re.sub(
+      scss = re.sub(
          r'\$row-number:\s[0-9|\.]+;',
          '$row-number: '+self.docsettings['rn']+';',
-         sass)
+         scss)
       #$header-odd: "Libriis, default header";
-      sass = re.sub(
+      scss = re.sub(
          r'\$header-odd:\s".+";',
          '$header-odd: "'+self.docsettings['ho']+'";',
-         sass)
+         scss)
       # $header-even: "Libriis, default header";
-      sass = re.sub(
+      scss = re.sub(
          r'\$header-even:\s".+";',
          '$header-even: "'+self.docsettings['he']+'";',
-         sass)
+         scss)
 
-      # print('sass', sass)
-      open(sassfilepath,"w").write(sass)
+      # print('scss', scss)
+      open(scssfilepath,"w").write(scss)
 
       if reload:
          self._mw.designstack.webkitview.reload()
@@ -186,7 +186,6 @@ class Core():
          'nb_page='+str(self.docsettings['np'])+';',
          js)
 
-      # print('sass', sass)
       open(jsfilepath,"w").write(js)
 
       if reload:
@@ -245,7 +244,7 @@ class Core():
       if not cwd == self.cwd:
          self.cwd = cwd
          self.server.reload()
-         self.sasscompiler.reload()
+         self.scsscompiler.reload()
          self.contentcompiler.reload()
 
       if not self.tempcwd:

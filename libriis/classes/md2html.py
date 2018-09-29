@@ -70,7 +70,9 @@ class Compiler():
       # get story div
       story_dom = template_dom.find('div', {"id":"flow-main"})
 
+      # page index
       pi = 0
+      # loop through pages following summary (pages liste)
       for p in self.sum:
          # print(toc[p])
          pagename = p['title']
@@ -84,14 +86,13 @@ class Compiler():
             continue
          # print('in_f : '+in_f)
 
-         pdoc_args = ['--mathjax',
-                      '--smart']
+         pdoc_args = ['--mathjax']
 
          pdoc_filters = []
 
          output = pypandoc.convert_file(in_f,
                                to='html5',
-                               format='markdown+header_attributes+link_attributes+bracketed_spans',
+                               format='markdown+smart+header_attributes+link_attributes+bracketed_spans',
                                extra_args=pdoc_args,
                                filters=pdoc_filters)
 

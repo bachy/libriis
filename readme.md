@@ -43,7 +43,7 @@ you'll have to build qt-webkit from source : https://github.com/annulen/webkit/w
 #### dependences
 ```shell
 apt-get install qt5-base pandoc python3 python3-pyqt5 python3-pip 
-pip3 install sass markdown beautifulsoup4 pypandoc pygments setuptools pyphen
+pip3 install pyScss markdown beautifulsoup4 pypandoc pygments setuptools pyphen
 ```
 #### Libriis
 clone

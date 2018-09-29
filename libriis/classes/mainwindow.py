@@ -348,6 +348,6 @@ class MainWindow(QMainWindow):
 
       self.mainstack.setCurrentIndex(self.core.mw_curstack)
 
-      # TODO: add an app console window (show sass compilation errors for example)
+      # TODO: add an app console window (show scss compilation errors for example)
 
       self.setCentralWidget(self.mainstack)
